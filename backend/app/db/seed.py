@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.session import SessionLocal
+from app.db.database import SessionLocal
 from app.models import Race, Category, Tag
 
 def seed_races(db: Session):
