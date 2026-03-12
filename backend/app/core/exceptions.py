@@ -22,3 +22,7 @@ class InvalidCredentialsError(AppException):
 class CategoryNotFoundError(AppException):
     status_code = 404
     detail = "Category not found"
+
+class PostNotFoundError(AppException):
+    status_code = 404
+    detail = "Post not found"

@@ -18,5 +18,10 @@ def get_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
+    current_user: User = Depends(auth.get_current_user)
 ):
-    return post_service.get_posts(db, skip, limit)
+    return post_service.get_posts(db, skip, limit, current_user)
+
+@router.get("/{post_id}", response_model=PostResponse)
+def get_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(auth.get_current_user)):
+    return post_service.get_post(db, post_id, current_user)
