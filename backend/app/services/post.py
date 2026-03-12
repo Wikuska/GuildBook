@@ -17,7 +17,7 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User) ->
         category_id=data.category_id,
     )
 
-    return post_crud.create_post(db, post)
+    return post_crud.create_post(db, post, data.visible_race_ids)
 
 def get_posts(db: Session, skip: int, limit: int, current_user: User):
     return post_crud.get_posts(skip, limit, db, current_user.race_id)

@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
-from app.models import Post
+from app.models import Post, PostVisibleRace
 
-def create_post(db: Session, post: Post) -> Post:
+def create_post(db: Session, post: Post, visible_race_ids: list[int]) -> Post:
     db.add(post)
+    db.flush()
+    
+    for race_id in visible_race_ids:
+        db.add(PostVisibleRace(post_id=post.id, race_id=race_id))
+    
     db.commit()
     db.refresh(post)
     return post
