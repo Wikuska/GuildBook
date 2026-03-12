@@ -12,10 +12,11 @@ def seed_races(db: Session):
 def seed_categories(db: Session):
     categories = [
         "discussion",
-        "trade",
-        "sell",
+        "market"
         "help_request",
         "announcement",
+        "event",
+        "contracts",
     ]
     for c in categories:
         if not db.query(Category).filter_by(name=c).first():
@@ -27,7 +28,7 @@ def seed_tags(db: Session):
         "alchemy",
         "weapon",
         "magic",
-        "forge",
+        "blacksmithing",
         "monsters",
     ]
     for t in tags:
