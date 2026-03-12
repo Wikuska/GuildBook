@@ -11,12 +11,14 @@ class EmailAlreadyExistsError(AppException):
     status_code = 400
     detail = "Email already exists"
 
-
 class UsernameAlreadyExistsError(AppException):
     status_code = 400
     detail = "Username already exists"
 
-
 class InvalidCredentialsError(AppException):
     status_code = 401
     detail = "Invalid email or password"
+    
+class CategoryNotFoundError(AppException):
+    status_code = 404
+    detail = "Category not found"
