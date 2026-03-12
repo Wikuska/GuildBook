@@ -23,7 +23,7 @@ def get_posts(db: Session, skip: int, limit: int, current_user: User):
     return post_crud.get_posts(skip, limit, db, current_user.race_id)
 
 def get_post(db: Session, post_id: int, current_user: User):
-    post = post_crud.get_post_by_id(db, post_id)
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
     if not post:
         raise PostNotFoundError()
     return post
