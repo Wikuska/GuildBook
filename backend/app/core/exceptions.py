@@ -26,3 +26,7 @@ class CategoryNotFoundError(AppException):
 class PostNotFoundError(AppException):
     status_code = 404
     detail = "Post not found"
+    
+class TagNotFoundError(AppException):
+    status_code = 404
+    detail = "Tag not found"   

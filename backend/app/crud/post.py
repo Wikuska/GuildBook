@@ -1,13 +1,16 @@
 from sqlalchemy import exists, and_, not_
 from sqlalchemy.orm import Session
-from app.models import Post, PostVisibleRace
+from app.models import Post, PostVisibleRace, PostTag
 
-def create_post(db: Session, post: Post, visible_race_ids: list[int]) -> Post:
+def create_post(db: Session, post: Post, visible_race_ids: list[int], tag_ids: list[int]) -> Post:
     db.add(post)
     db.flush()
     
     for race_id in visible_race_ids:
         db.add(PostVisibleRace(post_id=post.id, race_id=race_id))
+        
+    for tag_id in tag_ids:
+        db.add(PostTag(post_id=post.id, tag_id=tag_id))
     
     db.commit()
     db.refresh(post)

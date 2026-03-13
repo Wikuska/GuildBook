@@ -3,13 +3,22 @@ from app.models import User, Post
 from app.schemas.post import CreatePostRequest
 from app.crud import post as post_crud
 from app.crud import category as category_crud
-from app.core.exceptions import CategoryNotFoundError, PostNotFoundError
+from app.crud import tag as tag_crud
+from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError
 
 def create_new_post(db: Session, data: CreatePostRequest, current_user: User) -> Post:
     category = category_crud.get_category_by_id(db, data.category_id)
     if not category:
         raise CategoryNotFoundError()
 
+    tag_ids = list(dict.fromkeys(data.tag_ids))
+    visible_race_ids = list(dict.fromkeys(data.visible_race_ids))
+
+    if tag_ids:
+        tags = tag_crud.get_tags_by_ids(db, tag_ids)
+        if len(tags) != len(tag_ids):
+            raise TagNotFoundError()
+    
     post = Post(
         title=data.title,
         content=data.content,
@@ -17,7 +26,7 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User) ->
         category_id=data.category_id,
     )
 
-    return post_crud.create_post(db, post, data.visible_race_ids)
+    return post_crud.create_post(db, post, visible_race_ids, tag_ids = tag_ids)
 
 def get_posts(db: Session, skip: int, limit: int, current_user: User):
     return post_crud.get_posts(skip, limit, db, current_user.race_id)
