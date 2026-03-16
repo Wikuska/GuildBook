@@ -4,7 +4,7 @@ from app.schemas.post import CreatePostRequest
 from app.crud import post as post_crud
 from app.crud import category as category_crud
 from app.crud import tag as tag_crud
-from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError
+from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError, InvalidCategoryFilterError, InvalidTagFilterError
 
 def create_new_post(db: Session, data: CreatePostRequest, current_user: User) -> Post:
     category = category_crud.get_category_by_id(db, data.category_id)
@@ -28,8 +28,28 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User) ->
 
     return post_crud.create_post(db, post, visible_race_ids, tag_ids = tag_ids)
 
-def get_posts(db: Session, skip: int, limit: int, current_user: User):
-    return post_crud.get_posts(skip, limit, db, current_user.race_id)
+def get_posts(db: Session, skip: int, limit: int, current_user: User, category_ids: list[int] | None = None, tag_ids: list[int] | None = None):
+    
+    normalized_category_ids = list(set(category_ids)) if category_ids else None
+    normalized_tag_ids = list(set(tag_ids)) if tag_ids else None
+    
+    if normalized_category_ids:
+        if any(category_id <= 0 for category_id in normalized_category_ids):
+            raise InvalidCategoryFilterError()
+
+        categories = category_crud.get_categories_by_ids(db, normalized_category_ids)
+        if len(categories) != len(normalized_category_ids):
+            raise InvalidCategoryFilterError()
+
+    if normalized_tag_ids:
+        if any(tag_id <= 0 for tag_id in normalized_tag_ids):
+            raise InvalidTagFilterError()
+
+        tags = tag_crud.get_tags_by_ids(db, normalized_tag_ids)
+        if len(tags) != len(normalized_tag_ids):
+            raise InvalidTagFilterError()
+    
+    return post_crud.get_posts(skip, limit, db, current_user.race_id, category_ids=normalized_category_ids, tag_ids=normalized_tag_ids)
 
 def get_post(db: Session, post_id: int, current_user: User):
     post = post_crud.get_post_by_id(db, post_id, current_user.race_id)

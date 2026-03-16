@@ -15,12 +15,14 @@ def create_post(post: CreatePostRequest, db: Session = Depends(get_db), current_
 
 @router.get("/", response_model=list[PostResponse])
 def get_posts(
+    category_ids: list[int] | None = Query(None),
+    tag_ids: list[int] | None = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(auth.get_current_user)
 ):
-    return post_service.get_posts(db, skip, limit, current_user)
+    return post_service.get_posts(db, skip, limit, current_user, category_ids, tag_ids)
 
 @router.get("/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(auth.get_current_user)):
