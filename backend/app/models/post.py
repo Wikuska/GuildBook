@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Text, ForeignKey, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from .base import Base
+
+if TYPE_CHECKING:
+    from .tag import Tag
+    from .category import Category
 
 class Post(Base):
 	__tablename__ = 'posts'
@@ -12,6 +17,8 @@ class Post(Base):
 	author_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 	category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+	tags: Mapped[list["Tag"]] = relationship(secondary="post_tags",back_populates="posts",)
+	category: Mapped["Category"] = relationship()
 
 class PostTag(Base):
 	__tablename__ = 'post_tags'
