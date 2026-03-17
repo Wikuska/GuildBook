@@ -1,6 +1,9 @@
 from sqlalchemy import exists, and_, not_, or_, true
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.models import Post, PostVisibleRace, PostTag, Tag
+from app.core.exceptions import PostNotFoundError
+from app.crud import tag as tag_crud
+from app.crud import race as race_crud
 
 # HELPER FUNCTIONS
 
@@ -28,15 +31,13 @@ def _post_visibility_filter(race_id, user_id, is_admin):
 # POST FUNCTIONS
 
 def create_post(db: Session, post: Post, visible_race_ids: list[int], tag_ids: list[int]) -> Post:
+    if tag_ids:
+        post.tags = tag_crud.get_tags_by_ids(db, tag_ids)
+
+    if visible_race_ids:
+        post.visible_races = race_crud.get_races_by_ids(db, visible_race_ids)
+
     db.add(post)
-    db.flush()
-    
-    for race_id in visible_race_ids:
-        db.add(PostVisibleRace(post_id=post.id, race_id=race_id))
-        
-    for tag_id in tag_ids:
-        db.add(PostTag(post_id=post.id, tag_id=tag_id))
-    
     db.commit()
     db.refresh(post)
     return post
@@ -54,18 +55,25 @@ def update_post(
     post.content = content
     post.category_id = category_id
 
-    db.query(PostVisibleRace).filter(PostVisibleRace.post_id == post.id).delete()
-    db.query(PostTag).filter(PostTag.post_id == post.id).delete()
-
-    for race_id in visible_race_ids:
-        db.add(PostVisibleRace(post_id=post.id, race_id=race_id))
-
-    for tag_id in tag_ids:
-        db.add(PostTag(post_id=post.id, tag_id=tag_id))
+    post.tags = tag_crud.get_tags_by_ids(db, tag_ids)
+    post.visible_races = race_crud.get_races_by_ids(db, visible_race_ids)
 
     db.commit()
-    db.refresh(post)
-    return post
+    
+    updated_post = (
+        db.query(Post)
+        .options(
+            joinedload(Post.category),
+            selectinload(Post.tags),
+        )
+        .filter(Post.id == post.id)
+        .first()
+    )
+
+    if updated_post is None:
+        raise PostNotFoundError()
+
+    return updated_post
 
 def get_posts(
     skip: int,

@@ -9,19 +9,19 @@ from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNot
 # HELPER FUNCTIONS
 
 def _validate_category_exists(db: Session, category_id: int) -> None:
-    category = category_crud.get_category_by_id(db, category_id)
-    if not category:
+    if category_crud.count_categories_by_ids(db, [category_id]) == 0:
         raise CategoryNotFoundError()
 
-def _normalize_ids(ids: list[int]) -> list[int]:
+def _normalize_ids(ids: list[int]|None) -> list[int]:
+    if not ids:
+        return []
     return list(dict.fromkeys(ids))
 
 def _validate_tags_exist(db: Session, tag_ids: list[int]) -> None:
     if not tag_ids:
         return
 
-    tags = tag_crud.get_tags_by_ids(db, tag_ids)
-    if len(tags) != len(tag_ids):
+    if tag_crud.count_tags_by_ids(db, tag_ids) != len(tag_ids):
         raise TagNotFoundError()
     
 # POST FUNCTIONS
@@ -40,15 +40,15 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User) ->
         category_id=data.category_id,
     )
 
-    return post_crud.create_post(db, post, visible_race_ids, tag_ids = tag_ids)
+    return post_crud.create_post(db, post, visible_race_ids, tag_ids)
 
 def update_post(
     db: Session,
     post_id: int,
     data: CreatePostRequest,
     current_user: User
-):
-    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+) -> Post:
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
         raise PostNotFoundError()
     
@@ -78,9 +78,10 @@ def get_posts(
     current_user: User,
     category_ids: list[int] | None = None,
     tag_ids: list[int] | None = None
-):    
-    normalized_category_ids = list(set(category_ids)) if category_ids else None
-    normalized_tag_ids = list(set(tag_ids)) if tag_ids else None
+) -> list[Post]:    
+    
+    normalized_category_ids = _normalize_ids(category_ids) if category_ids else None
+    normalized_tag_ids = _normalize_ids(tag_ids) if tag_ids else None
     
     if normalized_category_ids:
         if any(category_id <= 0 for category_id in normalized_category_ids):
@@ -98,10 +99,19 @@ def get_posts(
         if len(tags) != len(normalized_tag_ids):
             raise InvalidTagFilterError()
     
-    return post_crud.get_posts(skip, limit, db, current_user.race_id, category_ids=normalized_category_ids, tag_ids=normalized_tag_ids)
+    return post_crud.get_posts(
+        skip=skip,
+        limit=limit,
+        db=db,
+        race_id=current_user.race_id,
+        user_id=current_user.id,
+        is_admin=current_user.is_admin,
+        category_ids=normalized_category_ids,
+        tag_ids=normalized_tag_ids,
+    )
 
-def get_post(db: Session, post_id: int, current_user: User):
-    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+def get_post(db: Session, post_id: int, current_user: User) -> Post:
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
         raise PostNotFoundError()
     return post

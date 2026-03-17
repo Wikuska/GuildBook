@@ -7,6 +7,7 @@ from .base import Base
 if TYPE_CHECKING:
     from .tag import Tag
     from .category import Category
+    from .race import Race
 
 class Post(Base):
 	__tablename__ = 'posts'
@@ -19,6 +20,7 @@ class Post(Base):
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	tags: Mapped[list["Tag"]] = relationship(secondary="post_tags",back_populates="posts",)
 	category: Mapped["Category"] = relationship()
+	visible_races: Mapped[list["Race"]] = relationship(secondary="post_visible_races", back_populates="posts",)
 
 class PostTag(Base):
 	__tablename__ = 'post_tags'
