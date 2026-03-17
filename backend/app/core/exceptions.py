@@ -38,3 +38,15 @@ class TagNotFoundError(AppException):
 class InvalidTagFilterError(AppException):
     status_code = 400
     detail = "Tag filter contains invalid or non-existing ids"
+    
+class CommentNotFoundError(AppException):
+    status_code = 404
+    detail = "Comment not found"
+    
+class CommentEditForbiddenError(AppException):
+    status_code = 403
+    detail = "Only comment author can make changes"
+    
+class CommentDeleteForbiddenError(AppException):
+    status_code = 403
+    detail = "Only comment author and admin can delete"

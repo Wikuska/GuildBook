@@ -5,6 +5,8 @@ from datetime import datetime
 class CreateCommentRequest(BaseModel):
     content: str = Field(..., min_length=1, max_length=1000)
 
+class UpdateCommentRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=1000)
 
 class CommentResponse(BaseModel):
     id: int
