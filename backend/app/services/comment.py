@@ -18,3 +18,10 @@ def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, cu
     )
 
     return comment_crud.create_comment(db, comment)
+
+def get_post_comments(db: Session, post_id: int, current_user: User) -> list[Comment]:
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+    if not post:
+        raise PostNotFoundError()
+    
+    return comment_crud.get_post_comments(db, post_id)

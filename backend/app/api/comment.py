@@ -18,3 +18,9 @@ def create_comment(
     current_user: User = Depends(auth.get_current_user)
 ):
     return comment_service.create_new_comment(db, post_id, comment, current_user)
+
+@router.get("/{post_id}/comments", response_model=list[CommentResponse])
+def get_post_comments(post_id: int,
+                 db: Session = Depends(get_db),
+                 current_user: User = Depends(auth.get_current_user)):
+    return comment_service.get_post_comments(db, post_id, current_user)
