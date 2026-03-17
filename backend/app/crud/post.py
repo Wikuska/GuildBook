@@ -2,6 +2,22 @@ from sqlalchemy import exists, and_, not_
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.models import Post, PostVisibleRace, PostTag, Tag
 
+# HELPER FUNCTIONS
+
+def _post_visibility_filter(race_id: int):
+    visible_for_race = exists().where(and_(
+        PostVisibleRace.post_id == Post.id,
+        PostVisibleRace.race_id == race_id
+    ))
+    
+    has_any_visibility_restriction = exists().where(
+        PostVisibleRace.post_id == Post.id
+    )
+    
+    return not_(has_any_visibility_restriction) | visible_for_race
+
+# POST FUNCTIONS
+
 def create_post(db: Session, post: Post, visible_race_ids: list[int], tag_ids: list[int]) -> Post:
     db.add(post)
     db.flush()
@@ -16,17 +32,31 @@ def create_post(db: Session, post: Post, visible_race_ids: list[int], tag_ids: l
     db.refresh(post)
     return post
 
-def post_visibility_filter(race_id: int):
-    visible_for_race = exists().where(and_(
-        PostVisibleRace.post_id == Post.id,
-        PostVisibleRace.race_id == race_id
-    ))
-    
-    has_any_visibility_restriction = exists().where(
-        PostVisibleRace.post_id == Post.id
-    )
-    
-    return not_(has_any_visibility_restriction) | visible_for_race
+def update_post(
+    db: Session,
+    post: Post,
+    title: str,
+    content: str,
+    category_id: int,
+    visible_race_ids: list[int],
+    tag_ids: list[int],
+) -> Post:
+    post.title = title
+    post.content = content
+    post.category_id = category_id
+
+    db.query(PostVisibleRace).filter(PostVisibleRace.post_id == post.id).delete()
+    db.query(PostTag).filter(PostTag.post_id == post.id).delete()
+
+    for race_id in visible_race_ids:
+        db.add(PostVisibleRace(post_id=post.id, race_id=race_id))
+
+    for tag_id in tag_ids:
+        db.add(PostTag(post_id=post.id, tag_id=tag_id))
+
+    db.commit()
+    db.refresh(post)
+    return post
 
 def get_posts(
     skip: int,
@@ -42,7 +72,7 @@ def get_posts(
             joinedload(Post.category),
             selectinload(Post.tags),
         )
-        .filter(post_visibility_filter(race_id))
+        .filter(_post_visibility_filter(race_id))
     )
 
     if category_ids:
@@ -59,12 +89,11 @@ def get_posts(
         .all()
     )
 
-
 def get_post_by_id(db: Session, post_id: int, race_id: int) -> Post|None:
     return (
         db.query(Post)
         .filter(Post.id == post_id)
-        .filter(post_visibility_filter(race_id))
+        .filter(_post_visibility_filter(race_id))
         .first()
     )
     

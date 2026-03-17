@@ -4,20 +4,34 @@ from app.schemas.post import CreatePostRequest
 from app.crud import post as post_crud
 from app.crud import category as category_crud
 from app.crud import tag as tag_crud
-from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError, InvalidCategoryFilterError, InvalidTagFilterError
+from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError, InvalidCategoryFilterError, InvalidTagFilterError, PostDeleteForbiddenError, PostEditForbiddenError
 
-def create_new_post(db: Session, data: CreatePostRequest, current_user: User) -> Post:
-    category = category_crud.get_category_by_id(db, data.category_id)
+# HELPER FUNCTIONS
+
+def _validate_category_exists(db: Session, category_id: int) -> None:
+    category = category_crud.get_category_by_id(db, category_id)
     if not category:
         raise CategoryNotFoundError()
 
-    tag_ids = list(dict.fromkeys(data.tag_ids))
-    visible_race_ids = list(dict.fromkeys(data.visible_race_ids))
+def _normalize_ids(ids: list[int]) -> list[int]:
+    return list(dict.fromkeys(ids))
 
-    if tag_ids:
-        tags = tag_crud.get_tags_by_ids(db, tag_ids)
-        if len(tags) != len(tag_ids):
-            raise TagNotFoundError()
+def _validate_tags_exist(db: Session, tag_ids: list[int]) -> None:
+    if not tag_ids:
+        return
+
+    tags = tag_crud.get_tags_by_ids(db, tag_ids)
+    if len(tags) != len(tag_ids):
+        raise TagNotFoundError()
+    
+# POST FUNCTIONS
+
+def create_new_post(db: Session, data: CreatePostRequest, current_user: User) -> Post:
+    
+    _validate_category_exists(db, data.category_id)
+    tag_ids = _normalize_ids(data.tag_ids)
+    visible_race_ids = _normalize_ids(data.visible_race_ids)
+    _validate_tags_exist(db, tag_ids)
     
     post = Post(
         title=data.title,
@@ -28,8 +42,43 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User) ->
 
     return post_crud.create_post(db, post, visible_race_ids, tag_ids = tag_ids)
 
-def get_posts(db: Session, skip: int, limit: int, current_user: User, category_ids: list[int] | None = None, tag_ids: list[int] | None = None):
+def update_post(
+    db: Session,
+    post_id: int,
+    data: CreatePostRequest,
+    current_user: User
+):
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+    if not post:
+        raise PostNotFoundError()
     
+    if post.author_id != current_user.id:
+        raise PostEditForbiddenError()
+
+    _validate_category_exists(db, data.category_id)
+    tag_ids = _normalize_ids(data.tag_ids)
+    visible_race_ids = _normalize_ids(data.visible_race_ids)
+    _validate_tags_exist(db, tag_ids)
+
+    return post_crud.update_post(
+        db,
+        post,
+        title=data.title,
+        content=data.content,
+        category_id=data.category_id,
+        visible_race_ids=visible_race_ids,
+        tag_ids=tag_ids,
+    )
+    
+
+def get_posts(
+    db: Session,
+    skip: int,
+    limit: int,
+    current_user: User,
+    category_ids: list[int] | None = None,
+    tag_ids: list[int] | None = None
+):    
     normalized_category_ids = list(set(category_ids)) if category_ids else None
     normalized_tag_ids = list(set(tag_ids)) if tag_ids else None
     

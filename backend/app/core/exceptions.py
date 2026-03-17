@@ -23,6 +23,14 @@ class PostNotFoundError(AppException):
     status_code = 404
     detail = "Post not found"
     
+class PostEditForbiddenError(AppException):
+    status_code = 403
+    detail = "Only author of the post can edit it"
+
+class PostDeleteForbiddenError(AppException):
+    status_code = 403
+    detail = "Only author of the post and admin can delete it"
+    
 class CategoryNotFoundError(AppException):
     status_code = 404
     detail = "Category not found"
