@@ -1,20 +1,29 @@
-from sqlalchemy import exists, and_, not_
+from sqlalchemy import exists, and_, not_, or_, true
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.models import Post, PostVisibleRace, PostTag, Tag
 
 # HELPER FUNCTIONS
 
-def _post_visibility_filter(race_id: int):
-    visible_for_race = exists().where(and_(
-        PostVisibleRace.post_id == Post.id,
-        PostVisibleRace.race_id == race_id
-    ))
+def _post_visibility_filter(race_id, user_id, is_admin):
+    if is_admin:
+        return true()
+    
+    visible_for_race = exists().where(
+        and_(
+            PostVisibleRace.post_id == Post.id,
+            PostVisibleRace.race_id == race_id,
+        )
+    )
     
     has_any_visibility_restriction = exists().where(
         PostVisibleRace.post_id == Post.id
     )
     
-    return not_(has_any_visibility_restriction) | visible_for_race
+    return or_(
+        Post.author_id == user_id,
+        not_(has_any_visibility_restriction),
+        visible_for_race
+    )
 
 # POST FUNCTIONS
 
@@ -63,6 +72,8 @@ def get_posts(
     limit: int,
     db: Session,
     race_id: int,
+    user_id: int,
+    is_admin: bool,
     category_ids: list[int] | None = None,
     tag_ids: list[int] | None = None,
 ) -> list[Post]:
@@ -72,7 +83,7 @@ def get_posts(
             joinedload(Post.category),
             selectinload(Post.tags),
         )
-        .filter(_post_visibility_filter(race_id))
+        .filter(_post_visibility_filter(race_id, user_id, is_admin))
     )
 
     if category_ids:
@@ -89,11 +100,22 @@ def get_posts(
         .all()
     )
 
-def get_post_by_id(db: Session, post_id: int, race_id: int) -> Post|None:
+def get_post_by_id(
+    db: Session,
+    post_id: int,
+    race_id: int,
+    user_id: int,
+    is_admin: bool
+) -> Post|None:
+    
     return (
         db.query(Post)
+        .options(
+            joinedload(Post.category),
+            selectinload(Post.tags),
+        )
         .filter(Post.id == post_id)
-        .filter(_post_visibility_filter(race_id))
+        .filter(_post_visibility_filter(race_id, user_id, is_admin))
         .first()
     )
     
