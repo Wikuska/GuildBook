@@ -115,3 +115,13 @@ def get_post(db: Session, post_id: int, current_user: User) -> Post:
     if not post:
         raise PostNotFoundError()
     return post
+
+def delete_post(db: Session, post_id: int, current_user: User) -> None:
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
+    if not post:
+        raise PostNotFoundError()
+    
+    if post.author_id != current_user.id and not current_user.is_admin:
+        raise PostDeleteForbiddenError()
+
+    post_crud.delete_post(db, post)

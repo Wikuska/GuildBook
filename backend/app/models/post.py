@@ -25,11 +25,11 @@ class Post(Base):
 class PostTag(Base):
 	__tablename__ = 'post_tags'
 
-	post_id: Mapped[int] = mapped_column(ForeignKey('posts.id'), primary_key=True)
+	post_id: Mapped[int] = mapped_column(ForeignKey('posts.id', ondelete="CASCADE"), primary_key=True)
 	tag_id: Mapped[int] = mapped_column(ForeignKey('tags.id'), primary_key=True)
 
 class PostVisibleRace(Base):
 	__tablename__ = 'post_visible_races'
 
-	post_id: Mapped[int] = mapped_column(ForeignKey('posts.id'), primary_key=True)
+	post_id: Mapped[int] = mapped_column(ForeignKey('posts.id', ondelete="CASCADE"), primary_key=True)
 	race_id: Mapped[int] = mapped_column(ForeignKey('races.id'), primary_key=True)

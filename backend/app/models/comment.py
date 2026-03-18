@@ -8,6 +8,6 @@ class Comment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey('posts.id'), nullable=False)
+    post_id: Mapped[int] = mapped_column(ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
     author_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
