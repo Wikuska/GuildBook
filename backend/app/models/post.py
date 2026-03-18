@@ -15,7 +15,7 @@ class Post(Base):
 	id: Mapped[int] = mapped_column(primary_key=True)
 	title: Mapped[str] = mapped_column(String(255), nullable=False)
 	content: Mapped[str] = mapped_column(Text, nullable=False)
-	author_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+	author_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
 	category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	tags: Mapped[list["Tag"]] = relationship(secondary="post_tags",back_populates="posts",)

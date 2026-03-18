@@ -8,6 +8,6 @@ class Message(Base):
 
 	id: Mapped[int] = mapped_column(primary_key=True)
 	content: Mapped[str] = mapped_column(Text, nullable=False)
-	sender_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-	receiver_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+	sender_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
+	receiver_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete="SET NULL"), nullable=True)
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
