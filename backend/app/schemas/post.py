@@ -23,7 +23,7 @@ class PostResponse(BaseModel):
     id: int
     title: str
     content: str
-    author_id: int | None
+    author_id: int
     category: CategoryResponse
     created_at: datetime
     tags: list[TagResponse] = Field(default_factory=list)

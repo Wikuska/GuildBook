@@ -11,7 +11,7 @@ class UpdateCommentRequest(BaseModel):
 class CommentResponse(BaseModel):
     id: int
     content: str
-    author_id: int | None
+    author_id: int
     post_id: int
     created_at: datetime
 

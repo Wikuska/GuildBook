@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.services import auth
@@ -18,7 +18,6 @@ def update_profile(
     current_user: User = Depends(auth.get_current_user),
 ):
     return user_service.update_profile(db, data, current_user)
-
 
 @router.get("/{user_id}", response_model=PublicUserResponse)
 def get_user(

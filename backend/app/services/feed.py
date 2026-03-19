@@ -14,6 +14,8 @@ def get_feed(db: Session, skip: int, limit: int, current_user: User) -> list[Pos
         skip=skip,
         limit=limit,
         race_id=current_user.race_id,
+        user_id=current_user.id,
+        is_admin=current_user.is_admin,
         category_ids=FEED_CATEGORY_IDS,
         tag_ids=None,
     )

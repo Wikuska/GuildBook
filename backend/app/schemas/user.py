@@ -33,7 +33,7 @@ class PublicUserResponse(BaseModel):
 
     id: int
     username: str
-    race_id: int | None
+    race_id: int
     bio: str | None
     avatar_url: str | None
     banner_url: str | None
