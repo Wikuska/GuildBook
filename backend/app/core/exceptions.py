@@ -18,6 +18,10 @@ class UsernameAlreadyExistsError(AppException):
 class InvalidCredentialsError(AppException):
     status_code = 401
     detail = "Invalid email or password"
+
+class UserNotFoundError(AppException):
+    status_code = 404
+    detail = "User not found"
     
 class PostNotFoundError(AppException):
     status_code = 404
@@ -58,3 +62,7 @@ class CommentEditForbiddenError(AppException):
 class CommentDeleteForbiddenError(AppException):
     status_code = 403
     detail = "Only comment author and admin can delete"
+
+class CannotMessageYourselfError(AppException):
+    status_code = 400
+    detail = "You cannot send a message to yourself"
