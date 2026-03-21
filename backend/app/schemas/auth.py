@@ -20,5 +20,5 @@ class UserMeResponse(BaseModel):
     id: int
     email: str
     username: str
-    race_id: int | None
+    race_id: int
     is_admin: bool

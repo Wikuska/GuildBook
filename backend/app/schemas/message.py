@@ -14,8 +14,8 @@ class SendMessageRequest(BaseModel):
 class MessageResponse(BaseModel):
     id: int
     content: str
-    sender_id: int | None
-    receiver_id: int | None
+    sender_id: int
+    receiver_id: int
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

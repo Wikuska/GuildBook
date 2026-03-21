@@ -70,10 +70,7 @@ def update_post(
         .first()
     )
 
-    if updated_post is None:
-        raise PostNotFoundError()
-
-    return updated_post
+    return updated_post if updated_post is not None else post
 
 def get_posts(
     skip: int,

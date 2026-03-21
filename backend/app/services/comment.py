@@ -7,7 +7,7 @@ from app.core.exceptions import PostNotFoundError, CommentDeleteForbiddenError, 
 
 
 def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, current_user: User) -> Comment:
-    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
         raise PostNotFoundError()
 
@@ -20,7 +20,7 @@ def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, cu
     return comment_crud.create_comment(db, comment)
 
 def get_post_comments(db: Session, post_id: int, current_user: User) -> list[Comment]:
-    post = post_crud.get_post_by_id(db, post_id, current_user.race_id)
+    post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
         raise PostNotFoundError()
     
