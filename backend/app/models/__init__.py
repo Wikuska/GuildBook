@@ -3,7 +3,7 @@ from .user import User
 from .race import Race
 from .category import Category
 from .tag import Tag
-from .post import Post, PostTag, PostVisibleRace
+from .post import Post, PostTag, PostVisibleRace, PostLike
 from .comment import Comment
 from .message import Message
 
