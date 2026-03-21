@@ -4,7 +4,8 @@ from app.db.database import get_db
 from app.services import auth
 from app.models import User
 from app.services import post as post_service
-from app.schemas.post import CreatePostRequest, PostResponse
+from app.services import post_like as post_like_service
+from app.schemas.post import CreatePostRequest, PostResponse, PostLikeStatusResponse
 
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -44,3 +45,20 @@ def delete_post(
     current_user: User = Depends(auth.get_current_user)
 ):
     post_service.delete_post(db, post_id, current_user)
+    
+@router.post("/{post_id}/like", response_model=PostLikeStatusResponse, status_code=status.HTTP_200_OK)
+def like_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth.get_current_user),
+):
+    return post_like_service.like_post(db=db, post_id=post_id, current_user=current_user)
+
+
+@router.delete("/{post_id}/like", response_model=PostLikeStatusResponse, status_code=status.HTTP_200_OK)
+def unlike_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth.get_current_user),
+):
+    return post_like_service.unlike_post(db=db, post_id=post_id, current_user=current_user)
