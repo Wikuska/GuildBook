@@ -66,3 +66,7 @@ class CommentDeleteForbiddenError(AppException):
 class CannotMessageYourselfError(AppException):
     status_code = 400
     detail = "You cannot send a message to yourself"
+
+class SelfFollowNotAllowedError(AppException):
+    status_code = 403
+    detail = "You cannon follow yourself"
