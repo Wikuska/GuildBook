@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, DateTime, func, Boolean, text, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from .base import Base
+
+if TYPE_CHECKING:
+    from .post import Post
 
 class User(Base):
     __tablename__ = 'users'
@@ -18,3 +22,4 @@ class User(Base):
     location: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    posts: Mapped[list["Post"]] = relationship(back_populates="author")
