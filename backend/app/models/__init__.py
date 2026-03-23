@@ -1,5 +1,5 @@
 from .base import Base
-from .user import User
+from .user import User, UserFollow
 from .race import Race
 from .category import Category
 from .tag import Tag
