@@ -24,9 +24,9 @@ def update_profile(
 def get_user(
     user_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(auth.get_current_user),
+    current_user : User = Depends(auth.get_current_user),
 ):
-    return user_service.get_user(db, user_id)
+    return user_service.get_user(db, user_id, current_user)
 
 @router.post("/{user_id}/follow", response_model = FollowStatusResponse)
 def follow_user(

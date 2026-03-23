@@ -37,3 +37,14 @@ def count_following(db: Session, user_id: int) -> int:
         .filter(UserFollow.follower_id == user_id)
         .count()
     )
+    
+def is_following(db: Session, follower_id: int, followed_id: int) -> bool:
+    return (
+        db.query(UserFollow)
+        .filter(
+            UserFollow.follower_id == follower_id,
+            UserFollow.followed_id == followed_id,
+        )
+        .first()
+        is not None
+    )

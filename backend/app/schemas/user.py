@@ -38,6 +38,9 @@ class PublicUserResponse(BaseModel):
     avatar_url: str | None
     banner_url: str | None
     location: str | None
+    followers_count: int = 0
+    following_count: int = 0
+    is_followed_by_current_user: bool = False
     
 class FollowStatusResponse(BaseModel):
     target_user_id: int
