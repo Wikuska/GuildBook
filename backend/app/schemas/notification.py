@@ -2,11 +2,15 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from app.models import NotificationType
 
+class ActorResponse(BaseModel):
+    id: int
+    username: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 class NotificationResponse(BaseModel):
     id: int
-    actor_id: int
-    actor_username: str
+    actor: ActorResponse
     type: NotificationType
     post_id: int | None
     is_read: bool
