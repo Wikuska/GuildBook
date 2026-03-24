@@ -6,17 +6,22 @@ from .tag import Tag
 from .post import Post, PostTag, PostVisibleRace, PostLike
 from .comment import Comment
 from .message import Message
+from .notification import Notification, NotificationType
 
 
 __all__ = [
     "Base", 
     "User", 
+    "UserFollow",
     "Race", 
     "Category", 
     "Tag", 
     "Post", 
     "PostTag", 
     "PostVisibleRace", 
+    "PostLike",
     "Comment", 
-    "Message"
+    "Message",
+    "Notification",
+    "NotificationType"
 ]
