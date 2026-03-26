@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('recipient_id', sa.Integer(), nullable=False),
     sa.Column('actor_id', sa.Integer(), nullable=False),
-    sa.Column('type', sa.Enum('followed', 'post_liked', 'post_commented', name='notificationtype'), nullable=False),
+    sa.Column('type', sa.Enum('follow', 'post_like', 'post_comment', name='notificationtype'), nullable=False),
     sa.Column('post_id', sa.Integer(), nullable=True),
     sa.Column('is_read', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
