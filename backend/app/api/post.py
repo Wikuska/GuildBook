@@ -14,17 +14,6 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 def create_post(post: CreatePostRequest, db: Session = Depends(get_db), current_user: User = Depends(auth.get_current_user)):
     return post_service.create_new_post(db, post, current_user)
 
-@router.get("/", response_model=list[PostResponse])
-def get_posts(
-    category_ids: list[int] | None = Query(None),
-    tag_ids: list[int] | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(auth.get_current_user)
-):
-    return post_service.get_posts(db, skip, limit, current_user, category_ids, tag_ids)
-
 @router.get("/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(auth.get_current_user)):
     return post_service.get_post(db, post_id, current_user)
@@ -45,6 +34,22 @@ def delete_post(
     current_user: User = Depends(auth.get_current_user)
 ):
     post_service.delete_post(db, post_id, current_user)
+    
+@router.get("/user/{user_id}", response_model=list[PostResponse])
+def get_user_posts(
+    user_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth.get_current_user)
+):
+    return post_service.get_user_posts(
+        db=db, 
+        posts_creator_id=user_id, 
+        skip=skip, 
+        limit=limit, 
+        current_user=current_user
+    )
     
 @router.post("/{post_id}/like", response_model=PostLikeStatusResponse, status_code=status.HTTP_200_OK)
 def like_post(

@@ -1,7 +1,7 @@
 from sqlalchemy import exists, and_, not_, or_, true
 from sqlalchemy.orm import Session, joinedload, selectinload
-from app.models import Post, PostVisibleRace, PostTag, Tag
-from app.core.exceptions import PostNotFoundError
+from datetime import datetime, timedelta, timezone
+from app.models import Post, PostVisibleRace, Tag
 from app.crud import tag as tag_crud
 from app.crud import race as race_crud
 
@@ -72,33 +72,82 @@ def update_post(
 
     return updated_post if updated_post is not None else post
 
-def get_posts(
+def get_user_posts(
+    posts_creator_id: int,
     skip: int,
     limit: int,
     db: Session,
     race_id: int,
     user_id: int,
     is_admin: bool,
+) -> list[Post]:
+    query = (
+        db.query(Post)
+        .filter(_post_visibility_filter(race_id, user_id, is_admin))
+        .filter(Post.author_id == posts_creator_id)
+    )
+
+    return (
+        query
+        .order_by(Post.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    
+def get_feed_posts(
+    db: Session,
+    followed_ids: list[int],
+    race_id: int,
+    user_id: int,
+    is_admin: bool,
+    skip: int,
+    limit: int,
     category_ids: list[int] | None = None,
     tag_ids: list[int] | None = None,
 ) -> list[Post]:
-    query = (
+    boost_cutoff = datetime.now(timezone.utc) - timedelta(days=3)
+    visibility = _post_visibility_filter(race_id, user_id, is_admin)
+
+    base_query = (
         db.query(Post)
         .options(
             joinedload(Post.category),
             selectinload(Post.tags),
         )
-        .filter(_post_visibility_filter(race_id, user_id, is_admin))
+        .filter(visibility)
     )
 
     if category_ids:
-        query = query.filter(Post.category_id.in_(category_ids))
+        base_query = base_query.filter(Post.category_id.in_(category_ids))
 
     if tag_ids:
-        query = query.join(Post.tags).filter(Tag.id.in_(tag_ids)).distinct()
+        base_query = base_query.join(Post.tags).filter(Tag.id.in_(tag_ids)).distinct()
+
+    if followed_ids:
+        boosted = (
+            base_query
+            .filter(
+                Post.author_id.in_(followed_ids),
+                Post.created_at >= boost_cutoff,
+            )
+            .order_by(Post.created_at.desc())
+            .all()
+        )
+        boosted_ids = {p.id for p in boosted}
+
+        rest = (
+            base_query
+            .filter(~Post.id.in_(boosted_ids) if boosted_ids else true())
+            .order_by(Post.created_at.desc())
+            .all()
+        )
+
+        combined = boosted + rest
+        return combined[skip: skip + limit]
 
     return (
-        query
+        base_query
         .order_by(Post.created_at.desc())
         .offset(skip)
         .limit(limit)

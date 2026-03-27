@@ -117,43 +117,22 @@ def update_post(
     return build_post_response(db, updated_post, current_user)
     
 
-def get_posts(
+def get_user_posts(
     db: Session,
+    posts_creator_id: int,
     skip: int,
     limit: int,
-    current_user: User,
-    category_ids: list[int] | None = None,
-    tag_ids: list[int] | None = None
+    current_user: User
 ) -> list[PostResponse]:    
     
-    normalized_category_ids = _normalize_ids(category_ids) if category_ids else None
-    normalized_tag_ids = _normalize_ids(tag_ids) if tag_ids else None
-    
-    if normalized_category_ids:
-        if any(category_id <= 0 for category_id in normalized_category_ids):
-            raise InvalidCategoryFilterError()
-
-        categories = category_crud.get_categories_by_ids(db, normalized_category_ids)
-        if len(categories) != len(normalized_category_ids):
-            raise InvalidCategoryFilterError()
-
-    if normalized_tag_ids:
-        if any(tag_id <= 0 for tag_id in normalized_tag_ids):
-            raise InvalidTagFilterError()
-
-        tags = tag_crud.get_tags_by_ids(db, normalized_tag_ids)
-        if len(tags) != len(normalized_tag_ids):
-            raise InvalidTagFilterError()
-    
-    posts = post_crud.get_posts(
+    posts = post_crud.get_user_posts(
+    posts_creator_id=posts_creator_id,
     skip=skip,
     limit=limit,
     db=db,
     race_id=current_user.race_id,
     user_id=current_user.id,
-    is_admin=current_user.is_admin,
-    category_ids=normalized_category_ids,
-    tag_ids=normalized_tag_ids,
+    is_admin=current_user.is_admin
 )
 
     return [build_post_response(db, post, current_user) for post in posts]
