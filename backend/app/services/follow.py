@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 
-from app.models import User
+from app.models import User, NotificationType
 from app.schemas.user import FollowStatusResponse
 from app.crud import user as user_crud
 from app.crud import follow as follow_crud
+from app.crud import notification as notification_crud
 from app.core.exceptions import UserNotFoundError, SelfFollowNotAllowedError
 
 
@@ -32,6 +33,13 @@ def follow_user(db: Session, target_user_id: int, current_user: User) -> FollowS
             db,
             follower_id = current_user.id,
             followed_id = target_user_id
+        )
+        
+        notification_crud.create_notification(
+            db,
+            recipient_id = target_user_id,
+            actor_id = current_user.id,
+            notification_type = NotificationType.follow
         )
         
     db.commit()

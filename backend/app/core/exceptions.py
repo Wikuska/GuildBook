@@ -70,3 +70,7 @@ class CannotMessageYourselfError(AppException):
 class SelfFollowNotAllowedError(AppException):
     status_code = 403
     detail = "You cannon follow yourself"
+    
+class NotificationNotFoundError(AppException):
+    status_code = 404
+    detail = "Notification not found"

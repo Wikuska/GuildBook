@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from app.models import User, Comment
+from app.models import User, Comment, NotificationType
 from app.schemas.comment import CreateCommentRequest, UpdateCommentRequest
 from app.crud import comment as comment_crud
 from app.crud import post as post_crud
+from app.crud import notification as notification_crud
 from app.core.exceptions import PostNotFoundError, CommentDeleteForbiddenError, CommentEditForbiddenError, CommentNotFoundError
 
 
@@ -11,14 +12,25 @@ def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, cu
     if not post:
         raise PostNotFoundError()
 
-    comment = Comment(
+    comment = comment_crud.create_comment(
+        db,
+        Comment(
         content=data.content,
         post_id=post_id,
         author_id=current_user.id,
+    ))
+
+    notification_crud.create_notification(
+    db,
+    recipient_id=post.author_id,
+    actor_id=current_user.id,
+    notification_type=NotificationType.post_comment,
+    post_id=post_id,
     )
-
-    return comment_crud.create_comment(db, comment)
-
+    
+    db.commit()
+    return comment
+    
 def get_post_comments(db: Session, post_id: int, current_user: User) -> list[Comment]:
     post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
@@ -40,7 +52,9 @@ def update_comment(
     if comment.author_id != current_user.id:
         raise CommentEditForbiddenError()
     
-    return comment_crud.update_comment(db, comment, data.content)
+    updated = comment_crud.update_comment(db, comment, data.content)
+    db.commit()
+    return updated
 
 def delete_comment(db: Session, comment_id: int, current_user: User) -> None:
     comment = comment_crud.get_comment_by_id(db, comment_id)
@@ -51,3 +65,4 @@ def delete_comment(db: Session, comment_id: int, current_user: User) -> None:
         raise CommentDeleteForbiddenError()
     
     comment_crud.delete_comment(db, comment)
+    db.commit()
