@@ -38,6 +38,14 @@ def count_following(db: Session, user_id: int) -> int:
         .count()
     )
     
+def get_followed_user_ids(db: Session, user_id: int) -> list[int]:
+    rows = (
+        db.query(UserFollow.followed_id)
+        .filter(UserFollow.follower_id == user_id)
+        .all()
+    )
+    return [row.followed_id for row in rows]
+    
 def is_following(db: Session, follower_id: int, followed_id: int) -> bool:
     return (
         db.query(UserFollow)
