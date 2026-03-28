@@ -10,6 +10,11 @@ class TagResponse(BaseModel):
     id: int
     name: str
     model_config = ConfigDict(from_attributes=True)
+    
+class RaceResponse(BaseModel):
+    id: int
+    name: str
+    model_config = ConfigDict(from_attributes=True)
 
 class CreatePostRequest(BaseModel):
     
