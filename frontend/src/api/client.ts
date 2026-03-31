@@ -1,3 +1,5 @@
+import { useAuthStore } from '../store/authStore';
+
 export const API_URL = "http://127.0.0.1:8000";
 
 interface ApiOptions extends RequestInit {
@@ -6,11 +8,17 @@ interface ApiOptions extends RequestInit {
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const { body, ...customConfig } = options;
-  
-  const headers = {
+
+  const token = useAuthStore.getState().token;
+
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...customConfig.headers,
+    ...((customConfig.headers as Record<string, string>) || {}),
   };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const config: RequestInit = {
     ...customConfig,
@@ -20,10 +28,15 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 
   const res = await fetch(`${API_URL}${path}`, config);
 
+  if (res.status === 401) {
+    useAuthStore.getState().logout();
+    window.location.href = '/auth';
+    return Promise.reject(new Error('Session expired'));
+  }
+
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    const errorMessage = errorData.detail || `HTTP Error: ${res.status}`;
-    throw new Error(errorMessage);
+    throw new Error(errorData.detail || `HTTP Error: ${res.status}`);
   }
 
   if (res.status === 204) return {} as T;
