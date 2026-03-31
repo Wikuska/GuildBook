@@ -4,9 +4,10 @@ import { getRaces } from '../../api/lookup';
 interface RaceSelectorProps {
   selectedRaceId: number;
   onSelectRace: (race: number) => void;
+  error?: string;
 }
 
-export function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelectorProps) {
+export function RaceSelector({ selectedRaceId, onSelectRace, error }: RaceSelectorProps) {
   const { data: races=[], isLoading, isError } = useQuery({
     queryKey: ['races'],
     queryFn: getRaces,
@@ -36,6 +37,7 @@ export function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelectorProps
           </button>
         ))}
       </div>
+      {error && <p className="mt-1 text-[11px] text-red-500">{error}</p>}
     </div>
   );
 }

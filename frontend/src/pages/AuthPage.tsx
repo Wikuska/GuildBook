@@ -36,7 +36,7 @@ export function AuthPage() {
             </button>
           </div>
 
-          {activeTab === 'login' ? <LoginForm /> : <RegisterForm />}
+          {activeTab === 'login' ? <LoginForm /> : <RegisterForm onSuccess={() => setActiveTab('login')}/>}
           
         </div>
       </div>
