@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { AuthSidebar } from '../components/auth/AuthSidebar';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
+import { useAuthStore } from '../store/authStore';
+import { Navigate } from 'react-router-dom';
 
 export function AuthPage() {
+  const token = useAuthStore((state) => state.token);
+  if (token) return <Navigate to='/feed' replace />
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   return (

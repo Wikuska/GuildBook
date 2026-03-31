@@ -6,8 +6,10 @@ import { Button } from '../ui/Button';
 import { loginUser } from '../../api/auth';
 import { loginSchema, type LoginFormData } from '../../validations/auth';
 import { useAuthStore } from '../../store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginForm() {
+  const navigate = useNavigate();
   const {register, handleSubmit, formState: {errors}} = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
   })
@@ -15,7 +17,8 @@ export function LoginForm() {
   const mutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      useAuthStore.getState().setToken(data.access_token)
+      useAuthStore.getState().setToken(data.access_token);
+      navigate('/feed')
     },
   });
 
