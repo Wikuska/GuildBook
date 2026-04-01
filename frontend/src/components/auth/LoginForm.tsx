@@ -7,6 +7,7 @@ import { loginUser } from '../../api/auth';
 import { loginSchema, type LoginFormData } from '../../validations/auth';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { ApiError } from '../../api/client';
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-      {mutation.isError && (
+      {(mutation.isError && mutation.error instanceof ApiError && mutation.error.status < 500) && (
         <div className="mb-4 rounded border border-red-900 bg-red-950/30 p-2 text-center text-[12px] text-red-500">
           {mutation.error.message}
         </div>

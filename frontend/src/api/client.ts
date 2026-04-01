@@ -2,8 +2,30 @@ import { useAuthStore } from '../store/authStore';
 
 export const API_URL = "http://127.0.0.1:8000";
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.name = 'ApiError';
+  }
+}
+
 interface ApiOptions extends RequestInit {
   body?: any;
+}
+
+function parseErrorMessage(errorData: any): string {
+  if (!errorData.detail) return 'Something went wrong';
+  
+  if (Array.isArray(errorData.detail)) {
+    return errorData.detail
+      .map((e: any) => `${e.loc.at(-1)}: ${e.msg}`)
+      .join(', ');
+  }
+  
+  return errorData.detail;
 }
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
@@ -29,14 +51,21 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   const res = await fetch(`${API_URL}${path}`, config);
 
   if (res.status === 401) {
-    useAuthStore.getState().logout();
-    window.location.href = '/auth';
-    return Promise.reject(new Error('Session expired'));
+    const isAuthRoute = path.startsWith('/auth');
+    
+    if (!isAuthRoute) {
+      useAuthStore.getState().logout();
+      window.location.href = '/auth';
+      return Promise.reject(new Error('Session expired'));
+    }
+    
+    const errorData = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, parseErrorMessage(errorData));
   }
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || `HTTP Error: ${res.status}`);
+    throw new ApiError(res.status, parseErrorMessage(errorData));
   }
 
   if (res.status === 204) return {} as T;

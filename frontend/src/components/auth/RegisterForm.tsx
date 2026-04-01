@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { RaceSelector } from './RaceSelector';
 import { registerUser } from '../../api/auth';
 import { registerSchema, type RegisterFormData } from '../../validations/auth';
+import { ApiError } from '../../api/client';
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -19,7 +20,7 @@ export function RegisterForm({onSuccess} : RegisterFormProps) {
 
   const mutation = useMutation({
     mutationFn: registerUser,
-    onSuccess,
+    onSuccess: onSuccess,
     });
 
   const onSubmit = (data: RegisterFormData) => {
@@ -29,7 +30,7 @@ export function RegisterForm({onSuccess} : RegisterFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-      {mutation.isError && (
+      {(mutation.isError && mutation.error instanceof ApiError && mutation.error.status < 500) && (
         <div className="mb-2 rounded border border-red-900 bg-red-950/30 p-2 text-[12px] text-red-500">
           {mutation.error.message}
         </div>

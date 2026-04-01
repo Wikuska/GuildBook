@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+[data-sonner-toast] {
+  background: #100e0b !important;
+}
