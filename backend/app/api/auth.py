@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.db.database import get_db
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserMeResponse
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserMeResponse, UserFeedResponse
 from app.services import auth
 from app.models import User
 from app.core.security import create_access_token
@@ -29,4 +29,10 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserMeResponse)
 def get_me(current_user: User = Depends(auth.get_current_user)):
+    return current_user
+
+@router.get("/me/feed-profile", response_model=UserFeedResponse)
+def get_feed_profile(
+    current_user: User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)):
     return current_user

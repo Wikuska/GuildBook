@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.schemas.auth import RegisterRequest
+from app.schemas.auth import RegisterRequest, UserFeedResponse
 from app.core.security import hash_password, verify_password, decode_access_token
 from app.models import User
 from fastapi import Depends
@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from app.core.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError, InvalidCredentialsError
 from app.crud import user as user_crud
+from app.crud import follow as follow_crud
 from app.db.database import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -58,3 +59,13 @@ def get_current_user(
         raise InvalidCredentialsError()
 
     return user
+
+def get_feed_profile(current_user: User, db: Session) -> UserFeedResponse:
+    return UserFeedResponse (
+        id=current_user.id,
+        username=current_user.username,
+        race=current_user.race,
+        avatar_url=current_user.avatar_url,
+        followers_count=follow_crud.count_followers(db, current_user.id),
+        following_count=follow_crud.count_following(db, current_user.id)
+    )

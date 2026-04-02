@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from app.schemas.post import RaceResponse
 
 class RegisterRequest(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
@@ -22,3 +23,12 @@ class UserMeResponse(BaseModel):
     username: str
     race_id: int
     is_admin: bool
+
+class UserFeedResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    username: str
+    race: RaceResponse
+    avatar_url: str | None = None
+    followers_count: int = 0
+    following_count: int = 0
