@@ -5,6 +5,7 @@ from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserM
 from app.services import auth
 from app.models import User
 from app.core.security import create_access_token
+from app.services import auth as aurt_services 
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -35,4 +36,4 @@ def get_me(current_user: User = Depends(auth.get_current_user)):
 def get_feed_profile(
     current_user: User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)):
-    return current_user
+    return aurt_services.get_feed_profile(current_user, db)
