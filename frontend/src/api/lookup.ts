@@ -1,10 +1,10 @@
 import { apiFetch } from './client';
 
-export interface Race {
+export interface RaceResponse {
   id: number;
   name: string;
 }
 
 export const getRaces = () => {
-  return apiFetch<Race[]>('/lookup/races');
+  return apiFetch<RaceResponse[]>('/lookup/races');
 };
