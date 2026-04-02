@@ -49,7 +49,7 @@ export function LoginForm() {
         {...register('password')} error={errors.password?.message}
       />
       
-      <div className="mb-4 mt-3 cursor-pointer text-right text-[11px] tracking-[0.5px] text-[#6b5e42] hover:text-[#c9a84c]">
+      <div className="mb-4 mt-3 cursor-pointer text-right text-[11px] tracking-[0.5px] text-sage hover:text-gold transition-colors">
         Forgot your password?
       </div>
       

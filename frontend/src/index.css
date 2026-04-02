@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  --color-gold: #c9a84c;
+  --color-sage: #6b5e42;
+  --color-parchment: #d4c4a0;
+  
+  --color-bg-deep: #0e0c0a;
+  --color-bg-mid: #100e0b;
+  --color-bg-surface: #1a1408;
+  --color-bg-hover: #2a2010;
+  --color-bg-input: #0a0906;
+  
+  --color-border-base: #2a2520;
+  --color-border-accent: #3d3428;
+  
+  --color-text-dim: #544a33;
+  --color-text-mid: #8a7a58;
+}
+
 [data-sonner-toast] {
   background: #100e0b !important;
 }

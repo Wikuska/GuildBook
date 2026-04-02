@@ -13,12 +13,12 @@ export function RaceSelector({ selectedRaceId, onSelectRace, error }: RaceSelect
     queryFn: getRaces,
   });
 
-  if (isLoading) return <div className="mb-4 text-[11px] text-[#6b5e42]">Loading races...</div>;
+  if (isLoading) return <div className="mb-4 text-[11px] text-sage">Loading races...</div>;
   if (isError) return <div className="mb-4 text-[11px] text-red-500">Failed to load races.</div>;
 
   return (
     <div className="mb-4">
-      <div className="mb-2.5 text-[11px] uppercase tracking-[1.5px] text-[#6b5e42]">
+      <div className="mb-2.5 text-[11px] uppercase tracking-[1.5px] text-sage">
         Choose your race
       </div>
       <div className="grid grid-cols-5 gap-1.5">
@@ -29,8 +29,8 @@ export function RaceSelector({ selectedRaceId, onSelectRace, error }: RaceSelect
             onClick={() => onSelectRace(Number(race.id))}
             className={`cursor-pointer rounded border-[0.5px] px-1 py-1.75 text-center text-[11px] tracking-[0.5px] transition-all duration-150 ${
               selectedRaceId === race.id
-                ? 'border-[#c9a84c] bg-[#1e180e] text-[#c9a84c]'
-                : 'border-[#2a2520] bg-[#0a0906] text-[#6b5e42] hover:border-[#c9a84c] hover:text-[#c9a84c]'
+                ? 'border-gold bg-bg-surface text-gold'
+                : 'border-border-base bg-bg-deep text-sage hover:border-gold hover:text-gold'
             }`}
           >
             {race.name}
