@@ -1,12 +1,22 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from "../../store/authStore";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { Topbar } from "../nav/Topbar";
+import { useLocation } from "react-router-dom";
 
 export function ProtectedRoute() {
   const token = useAuthStore((state) => state.token);
-  useCurrentUser()
+  const { pathname } = useLocation();
+  useCurrentUser();
 
   if (!token) return <Navigate to="/auth" replace />;
-  
-  return <Outlet />;
+
+  const activePage = pathname.slice(1);
+
+  return (
+    <div className="min-h-screen bg-deep">
+      <Topbar activePage={activePage} />
+      <Outlet />
+    </div>
+  );
 }
