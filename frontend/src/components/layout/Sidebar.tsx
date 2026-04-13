@@ -1,5 +1,5 @@
 import { Avatar } from "../ui/Avatar";
-import { useFilterStore } from "../../store/FilterStore";
+import { useFilterStore } from "../../store/filterStore";
 import { useTags } from "../../hooks/useTags";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 
@@ -81,8 +81,8 @@ export function Sidebar() {
             <TagButton
                 key={tag.id || tag.name}
                 label={tag.name}
-                isActive={selectedTag === tag.name}
-                onClick={() => setSelectedTag(tag.name)}
+                isActive={selectedTag?.id === tag.id}
+                onClick={() => setSelectedTag(tag)}
             />
             ))}
         </div>
