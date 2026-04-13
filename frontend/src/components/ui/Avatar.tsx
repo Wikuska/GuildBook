@@ -16,7 +16,7 @@ const DEFAULT_RACE_COLORS = {
 };
 
 interface AvatarProps {
-  username: string;
+  username?: string;
   raceName?: string;
   size?: "sm" | "md" | "lg";
 }

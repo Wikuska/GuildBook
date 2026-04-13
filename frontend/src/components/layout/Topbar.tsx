@@ -43,7 +43,9 @@ export function Topbar({ activePage = "feed" }: { activePage?: string }) {
 
       <nav className="flex flex-1">
         {NAV_ITEMS.map((item) => (
-          <NavItem key={item} label={item} isActive={item === activePage} />
+          <Link key={item} to={`/${item}`}>
+            <NavItem key={item} label={item} isActive={item === activePage} />
+          </Link>
         ))}
       </nav>
 

@@ -5,6 +5,15 @@ export interface RaceResponse {
   name: string;
 }
 
+export interface TagResponse {
+  id: number;
+  name: string;
+}
+
 export const getRaces = () => {
   return apiFetch<RaceResponse[]>('/lookup/races');
+};
+
+export const fetchTags = () => {
+  return apiFetch<TagResponse[]>('/lookup/tags');
 };
