@@ -1,8 +1,13 @@
-import { usePosts } from "../hooks/usePosts"
-import { PostCard } from "../components/shared/PostCard"
+import { usePosts } from "../../hooks/usePosts"
+import { PostCard } from "./PostCard"
 
-export function FeedPage() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = usePosts("feed")
+interface PostFeedProps {
+    endpoint: string
+    title: string
+}
+
+export function PostFeed({ endpoint, title }: PostFeedProps) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = usePosts(endpoint)
 
   const posts = data?.pages.flat() ?? []
 
@@ -22,7 +27,7 @@ export function FeedPage() {
     <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-5">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[1.5px] text-text-dim before:h-1 before:w-1 before:shrink-0 before:rotate-45 before:bg-gold">
-          Latest scrolls
+          {title}
         </div>
         <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
           + New post

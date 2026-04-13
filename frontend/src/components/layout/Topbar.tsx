@@ -1,9 +1,9 @@
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Avatar } from "../ui/Avatar";
 import { Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-const NAV_ITEMS = ["feed", "market", "help", "Contracts"];
+const NAV_ITEMS = ["feed", "market", "help", "contracts"];
 
 const NavItem = ({
   label,
@@ -31,8 +31,9 @@ const NotificationBell = () => (
   </div>
 );
 
-export function Topbar({ activePage = "feed" }: { activePage?: string }) {
-  const { data: user } = useCurrentUser();
+export function Topbar() {
+  const { pathname } = useLocation()
+  const { data: user } = useCurrentUser()
 
   return (
     <div className="flex items-center h-13 px-6 gap-8 relative border-b bg-bg-mid border-border-base">
@@ -43,8 +44,8 @@ export function Topbar({ activePage = "feed" }: { activePage?: string }) {
 
       <nav className="flex flex-1">
         {NAV_ITEMS.map((item) => (
-          <Link key={item} to={`/${item}`}>
-            <NavItem key={item} label={item} isActive={item === activePage} />
+          <Link key={item} to={`/feed/${item === "feed" ? "" : item}`}>
+            <NavItem label={item} isActive={pathname === `/feed/${item === "feed" ? "" : item}` || (item === "feed" && pathname === "/feed")} />
           </Link>
         ))}
       </nav>

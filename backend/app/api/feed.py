@@ -32,7 +32,7 @@ def get_market(
     return feed_service.get_market(db, skip, limit, current_user, tag_ids)
 
 
-@router.get("/help-requests", response_model=list[PostResponse])
+@router.get("/help", response_model=list[PostResponse])
 def get_help_requests(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
