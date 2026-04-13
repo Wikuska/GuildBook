@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from app.models import Post, PostVisibleRace, Tag
 from app.crud import tag as tag_crud
 from app.crud import race as race_crud
+from app.models.user import User
 
 # HELPER FUNCTIONS
 
@@ -112,6 +113,7 @@ def get_feed_posts(
     base_query = (
         db.query(Post)
         .options(
+            joinedload(Post.author).joinedload(User.race),
             joinedload(Post.category),
             selectinload(Post.tags),
         )

@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models import Comment
 
@@ -25,3 +26,15 @@ def update_comment(db: Session, comment: Comment, content: str) -> Comment:
 def delete_comment(db: Session, comment: Comment) -> None:
     db.delete(comment)
     db.flush()
+    
+def count_post_comments(db: Session, post_id: int) -> int:
+    return db.query(Comment).filter(Comment.post_id == post_id).count()
+
+def get_comments_count_map(db: Session, post_ids: list[int]) -> dict[int, int]:
+    rows = (
+        db.query(Comment.post_id, func.count(Comment.id))
+        .filter(Comment.post_id.in_(post_ids))
+        .group_by(Comment.post_id)
+        .all()
+    )
+    return {post_id: count for post_id, count in rows}

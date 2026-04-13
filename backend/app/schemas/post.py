@@ -15,6 +15,12 @@ class RaceResponse(BaseModel):
     id: int
     name: str
     model_config = ConfigDict(from_attributes=True)
+    
+class AuthorResponse(BaseModel):
+    id: int
+    username: str
+    race: RaceResponse
+    model_config = ConfigDict(from_attributes=True)
 
 class CreatePostRequest(BaseModel):
     
@@ -33,11 +39,13 @@ class PostResponse(BaseModel):
     id: int
     title: str
     content: str
-    author_id: int
+    author: AuthorResponse
     category: CategoryResponse
     created_at: datetime
     tags: list[TagResponse] = Field(default_factory=list)
     likes_count: int
+    comments_count: int
     is_liked_by_current_user: bool
+    is_followed_author: bool
     
     model_config = ConfigDict(from_attributes=True)
