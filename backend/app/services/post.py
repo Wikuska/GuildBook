@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from app.models import User, Post
-from app.schemas.post import CreatePostRequest, PostResponse, TagResponse, CategoryResponse
+from app.schemas.post import CreatePostRequest, PostResponse, TagResponse, CategoryResponse, AuthorResponse
 from app.crud import post as post_crud
 from app.crud import category as category_crud
 from app.crud import tag as tag_crud
 from app.crud import post_like as post_like_crud
+from app.crud import comment as comment_crud
 from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError, InvalidCategoryFilterError, InvalidTagFilterError, PostDeleteForbiddenError, PostEditForbiddenError
 
 # HELPER FUNCTIONS
@@ -28,41 +29,55 @@ def _validate_tags_exist(db: Session, tag_ids: list[int]) -> None:
 def _build_post_response(
     post: Post,
     likes_count: int,
+    comments_count: int,
     is_liked_by_current_user: bool,
+    followed_ids: set[int] = set(),
 ) -> PostResponse:
     return PostResponse(
         id=post.id,
         title=post.title,
         content=post.content,
-        author_id=post.author_id,
+        author=AuthorResponse.model_validate(post.author),
         category=CategoryResponse.model_validate(post.category),
         created_at=post.created_at,
         tags=[TagResponse.model_validate(tag) for tag in post.tags],
         likes_count=likes_count,
+        comments_count=comments_count,
         is_liked_by_current_user=is_liked_by_current_user,
+        is_followed_author=post.author_id in followed_ids,
     )
     
 # RESPONSE BUILDERS
 
 def build_post_response(db: Session, post: Post, current_user: User) -> PostResponse:
     likes_count = post_like_crud.count_post_likes(db, post.id)
+    comments_count = comment_crud.count_post_comments(db, post.id)
     is_liked = post_like_crud.is_post_liked_by_user(db, post.id, current_user.id)
 
-    return _build_post_response(post, likes_count, is_liked)
+    return _build_post_response(post, likes_count, comments_count, is_liked)
 
-def build_post_responses(db: Session, posts: list[Post], current_user: User) -> list[PostResponse]:
+def build_post_responses(
+    db: Session,
+    posts: list[Post],
+    current_user: User,
+    followed_ids: set[int] = set(),
+) -> list[PostResponse]:
     if not posts:
         return []
 
+    followed_ids = followed_ids or set()
     post_ids = [post.id for post in posts]
     likes_count_map = post_like_crud.get_post_likes_count_map(db, post_ids)
+    comments_count_map = comment_crud.get_comments_count_map(db, post_ids)
     liked_post_ids = post_like_crud.get_liked_post_ids_for_user(db, post_ids, current_user.id)
 
     return [
         _build_post_response(
             post,
             likes_count_map.get(post.id, 0),
+            comments_count_map.get(post.id, 0),
             post.id in liked_post_ids,
+            followed_ids,
         )
         for post in posts
     ]

@@ -56,7 +56,7 @@ def _build_feed(
         tag_ids=tag_ids
     )
 
-    return build_post_responses(db, posts, current_user)
+    return build_post_responses(db, posts, current_user, followed_ids=set(followed_ids))
 
 
 def get_feed(db, skip, limit, current_user, tag_ids):
