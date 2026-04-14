@@ -21,3 +21,13 @@
 [data-sonner-toast] {
   background: #100e0b !important;
 }
+
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+  
+  button:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+}

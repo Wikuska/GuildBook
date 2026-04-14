@@ -42,8 +42,10 @@ class PublicUserResponse(BaseModel):
     location: str | None
     followers_count: int = 0
     following_count: int = 0
+    posts_count: int = 0
     is_followed_by_current_user: bool = False
     created_at: datetime
+    
     
 class PrivateUserResponse(PublicUserResponse):
     email: str
