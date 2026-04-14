@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import User
-from app.schemas.user import UpdateProfileRequest, PublicUserResponse
+from app.schemas.user import UpdateProfileRequest, PublicUserResponse, PrivateUserResponse
 from app.crud import user as user_crud
 from app.crud import follow as follow_crud
 from app.core.exceptions import UsernameAlreadyExistsError, UserNotFoundError
@@ -9,14 +9,32 @@ def build_public_user_response(db: Session, user: User, current_user: User) -> P
     return PublicUserResponse(
         id = user.id,
         username = user.username,
-        race_id = user.race_id,
+        race = user.race,
         bio = user.bio,
         avatar_url = user.avatar_url,
         banner_url = user.banner_url,
         location = user.location,
         followers_count = follow_crud.count_followers(db, user.id),
         following_count = follow_crud.count_following(db, user.id),
-        is_followed_by_current_user = follow_crud.is_following(db, current_user.id, user.id)
+        is_followed_by_current_user = follow_crud.is_following(db, current_user.id, user.id),
+        created_at=user.created_at
+    )
+    
+def build_private_user_response(db: Session, user: User) -> PrivateUserResponse:
+    return PrivateUserResponse(
+        id = user.id,
+        email = user.email,
+        is_admin = user.is_admin,
+        username = user.username,
+        race = user.race,
+        bio = user.bio,
+        avatar_url = user.avatar_url,
+        banner_url = user.banner_url,
+        location = user.location,
+        followers_count = follow_crud.count_followers(db, user.id),
+        following_count = follow_crud.count_following(db, user.id),
+        is_followed_by_current_user = False,
+        created_at = user.created_at
     )
 
 def get_user(db: Session, user_id: int, current_user: User) -> PublicUserResponse:
@@ -34,4 +52,4 @@ def update_profile(db: Session, data: UpdateProfileRequest, current_user: User) 
             raise UsernameAlreadyExistsError()
 
     updated_user = user_crud.update_user(db, current_user, **updates)
-    return build_public_user_response(db, updated_user, current_user)
+    return build_private_user_response(db, updated_user)
