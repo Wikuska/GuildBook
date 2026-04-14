@@ -7,7 +7,7 @@ import { Navigate } from 'react-router-dom';
 
 export function AuthPage() {
   const token = useAuthStore((state) => state.token);
-  // if (token) return <Navigate to='/feed' replace />
+  if (token) return <Navigate to='/feed' replace />
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   return (
