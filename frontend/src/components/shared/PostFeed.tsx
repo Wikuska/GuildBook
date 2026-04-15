@@ -4,9 +4,10 @@ import { PostCard } from "./PostCard"
 interface PostFeedProps {
     endpoint: string
     title: string
+    profileView?: boolean
 }
 
-export function PostFeed({ endpoint, title }: PostFeedProps) {
+export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = usePosts(endpoint)
 
   const posts = data?.pages.flat() ?? []
@@ -29,9 +30,11 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[1.5px] text-text-dim before:h-1 before:w-1 before:shrink-0 before:rotate-45 before:bg-gold">
           {title}
         </div>
-        <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
-          + New post
-        </button>
+        {!profileView && (
+          <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
+            + New post
+          </button>
+        )}
       </div>
 
       {posts.length === 0 && (
