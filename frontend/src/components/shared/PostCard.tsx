@@ -3,11 +3,19 @@ import { type PostResponse } from "../../api/posts";
 import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
 import { Link } from "react-router-dom";
+import type { QueryKey } from "@tanstack/query-core";
 
-export function PostCard({ post }: { post: PostResponse }) {
+export function PostCard({
+  post,
+  queryKey,
+}: {
+  post: PostResponse;
+  queryKey: QueryKey;
+}) {
   const { mutate: toggleLike } = useToggleLike(
     post.id,
     post.is_liked_by_current_user,
+    queryKey,
   );
 
   return (

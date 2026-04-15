@@ -39,6 +39,7 @@ export default function UserProfile() {
                 <PostFeed
                   endpoint={`posts/user/${profile.id}`}
                   title="Scrolls"
+                  profileView={true}
                 />
               </div>
               <ProfileRightPanel />

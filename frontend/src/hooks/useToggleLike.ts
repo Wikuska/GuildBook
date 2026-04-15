@@ -1,23 +1,28 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toggleLikePost } from "../api/posts"
-import { useFilterStore } from "../store/filterStore"
+import {
+  useMutation,
+  useQueryClient,
+  type QueryKey,
+} from "@tanstack/react-query";
+import { toggleLikePost } from "../api/posts";
 
-export function useToggleLike(postId: number, isLiked: boolean) {
-  const queryClient = useQueryClient()
-  const selectedTag = useFilterStore(s => s.selectedTag)
-  const queryKey = ["feed", selectedTag?.id ?? null]
+export function useToggleLike(
+  postId: number,
+  isLiked: boolean,
+  queryKey: QueryKey,
+) {
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => toggleLikePost(postId, isLiked),
 
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey })
-      const previous = queryClient.getQueryData(queryKey)
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old: any) => ({
         ...old,
         pages: old.pages.map((page: any[]) =>
-          page.map(post =>
+          page.map((post) =>
             post.id === postId
               ? {
                   ...post,
@@ -26,20 +31,20 @@ export function useToggleLike(postId: number, isLiked: boolean) {
                     ? post.likes_count - 1
                     : post.likes_count + 1,
                 }
-              : post
-          )
+              : post,
+          ),
         ),
-      }))
+      }));
 
-      return { previous }
+      return { previous };
     },
 
     onError: (_err, _vars, context) => {
-      queryClient.setQueryData(queryKey, context?.previous)
+      queryClient.setQueryData(queryKey, context?.previous);
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey })
+      queryClient.invalidateQueries({ queryKey });
     },
-  })
+  });
 }
