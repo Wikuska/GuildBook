@@ -1,9 +1,14 @@
-import { useToggleLike } from "../../hooks/useToggleLike"
-import { type PostResponse } from "../../api/posts"
-import { Avatar } from "../ui/Avatar" 
+import { useToggleLike } from "../../hooks/useToggleLike";
+import { type PostResponse } from "../../api/posts";
+import { Avatar } from "../ui/Avatar";
+import { formatTime } from "../../utils";
+import { Link } from "react-router-dom";
 
 export function PostCard({ post }: { post: PostResponse }) {
-  const { mutate: toggleLike } = useToggleLike(post.id, post.is_liked_by_current_user)
+  const { mutate: toggleLike } = useToggleLike(
+    post.id,
+    post.is_liked_by_current_user,
+  );
 
   return (
     <article
@@ -18,24 +23,34 @@ export function PostCard({ post }: { post: PostResponse }) {
       `}
     >
       <div className="mb-2.5 flex items-center gap-2">
-        <Avatar 
-          username={post.author.username} 
-          raceName={post.author.race.name} 
-          size="sm" 
-        />
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5 text-[13px] font-medium text-parchment">
-            {post.author.username}
-            
-            {post.is_followed_author && (
-              <span className="rounded-[3px] border border-border-accent bg-bg-surface px-1.5 py-px text-[10px] tracking-[0.5px] text-sage">
-                following
-              </span>
-            )}
+        <Link
+          to={`/profile/${post.author.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="mb-2.5 flex items-center gap-2"
+        >
+          <Avatar
+            username={post.author.username}
+            avatarUrl={post.author.avatar_url}
+            raceName={post.author.race.name}
+            size="sm"
+          />
+          <div className="flex-1">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-parchment">
+              {post.author.username}
+              {post.is_followed_author && (
+                <span className="rounded-[3px] border border-border-accent bg-bg-surface px-1.5 py-px text-[10px] tracking-[0.5px] text-sage">
+                  following
+                </span>
+              )}
+            </div>
+            <div className="text-[11px] text-text-dim">
+              {post.author.race.name}
+            </div>
           </div>
-          <div className="text-[11px] text-text-dim">{post.author.race.name}</div>
-        </div>
-        <span className="text-[11px] text-text-dim">{formatTime(post.created_at)}</span>
+          <span className="text-[11px] text-text-dim">
+            {formatTime(post.created_at)}
+          </span>
+        </Link>
       </div>
       <div className="mb-1.5 text-sm font-medium leading-[1.4] text-parchment">
         {post.title}
@@ -58,8 +73,8 @@ export function PostCard({ post }: { post: PostResponse }) {
         <div className="flex items-center gap-3">
           <button
             onClick={(e) => {
-              e.stopPropagation() 
-              toggleLike()
+              e.stopPropagation();
+              toggleLike();
             }}
             className="group/btn flex items-center gap-1.5 text-xs transition-colors"
           >
@@ -71,18 +86,24 @@ export function PostCard({ post }: { post: PostResponse }) {
                 className="transition-colors group-hover/btn:stroke-muted"
               />
             </svg>
-            <span className={post.is_liked_by_current_user ? "text-gold" : "text-text-dim group-hover/btn:text-muted"}>
+            <span
+              className={
+                post.is_liked_by_current_user
+                  ? "text-gold"
+                  : "text-text-dim group-hover/btn:text-muted"
+              }
+            >
               {post.likes_count}
             </span>
           </button>
           <button className="group/btn flex items-center gap-1.5 text-xs text-text-dim transition-colors hover:text-muted">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path 
-                d="M2 2h10v8H8l-3 2v-2H2z" 
-                stroke="#3d3428" 
-                strokeWidth="1" 
+              <path
+                d="M2 2h10v8H8l-3 2v-2H2z"
+                stroke="#3d3428"
+                strokeWidth="1"
                 fill="none"
-                className="transition-colors group-hover/btn:stroke-muted" 
+                className="transition-colors group-hover/btn:stroke-muted"
               />
             </svg>
             <span>{post.comments_count}</span>
@@ -90,14 +111,5 @@ export function PostCard({ post }: { post: PostResponse }) {
         </div>
       </div>
     </article>
-  )
-}
-
-function formatTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
+  );
 }

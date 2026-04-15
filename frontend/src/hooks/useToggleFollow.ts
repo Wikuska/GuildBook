@@ -4,7 +4,7 @@ import { toggleFollowUser } from "../api/users";
 export function useToggleFollow(userId: string, isFollowing: boolean) {
   const queryClient = useQueryClient();
 
-  const queryKey = ["profile", userId];
+  const queryKey = ["profile", String(userId)];
 
   return useMutation({
     mutationFn: () => toggleFollowUser(userId, isFollowing),

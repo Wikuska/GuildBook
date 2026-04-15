@@ -32,8 +32,8 @@ const NotificationBell = () => (
 );
 
 export function Topbar() {
-  const { pathname } = useLocation()
-  const { data: user } = useCurrentUser()
+  const { pathname } = useLocation();
+  const { data: user } = useCurrentUser();
 
   return (
     <div className="flex items-center h-13 px-6 gap-8 relative border-b bg-bg-mid border-border-base">
@@ -45,7 +45,13 @@ export function Topbar() {
       <nav className="flex flex-1">
         {NAV_ITEMS.map((item) => (
           <Link key={item} to={`/feed/${item === "feed" ? "" : item}`}>
-            <NavItem label={item} isActive={pathname === `/feed/${item === "feed" ? "" : item}` || (item === "feed" && pathname === "/feed")} />
+            <NavItem
+              label={item}
+              isActive={
+                pathname === `/feed/${item === "feed" ? "" : item}` ||
+                (item === "feed" && pathname === "/feed")
+              }
+            />
           </Link>
         ))}
       </nav>
@@ -55,6 +61,7 @@ export function Topbar() {
         <Link to={`/profile/${user?.id}`}>
           <Avatar
             username={user?.username ?? "?"}
+            avatarUrl={user?.avatar_url}
             raceName={user?.race?.name}
             size="sm"
           />
