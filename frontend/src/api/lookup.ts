@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { apiFetch } from "./client";
 
 export interface RaceResponse {
   id: number;
@@ -10,8 +10,8 @@ export interface TagResponse {
   name: string;
 }
 
-export const getRaces = () => {
-  return apiFetch<RaceResponse[]>('/lookup/races');
+export const fetchRaces = () => {
+  return apiFetch<RaceResponse[]>("/lookup/races");
 };
 
 export const fetchTags = () => {

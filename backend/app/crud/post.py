@@ -175,6 +175,9 @@ def get_post_by_id(
         .first()
     )
     
+def count_user_posts(db: Session, user_id: int) -> int:
+    return db.query(Post).filter(Post.author_id == user_id).count()
+    
 def delete_post(db: Session, post: Post) -> None:
     db.delete(post)
     db.commit()

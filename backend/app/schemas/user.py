@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from datetime import datetime
 
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from app.schemas.post import RaceResponse
 
 class UpdateProfileRequest(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)
@@ -33,14 +35,21 @@ class PublicUserResponse(BaseModel):
 
     id: int
     username: str
-    race_id: int
+    race: RaceResponse
     bio: str | None
     avatar_url: str | None
     banner_url: str | None
     location: str | None
     followers_count: int = 0
     following_count: int = 0
+    posts_count: int = 0
     is_followed_by_current_user: bool = False
+    created_at: datetime
+    
+    
+class PrivateUserResponse(PublicUserResponse):
+    email: str
+    is_admin: bool
     
 class FollowStatusResponse(BaseModel):
     target_user_id: int

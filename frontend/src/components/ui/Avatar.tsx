@@ -17,11 +17,17 @@ const DEFAULT_RACE_COLORS = {
 
 interface AvatarProps {
   username?: string;
+  avatarUrl?: string | null;
   raceName?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export function Avatar({ username, raceName, size = "md" }: AvatarProps) {
+export function Avatar({
+  username,
+  avatarUrl,
+  raceName,
+  size = "md",
+}: AvatarProps) {
   const initial = username ? username.charAt(0).toUpperCase() : "?";
 
   const colors =
@@ -44,7 +50,15 @@ export function Avatar({ username, raceName, size = "md" }: AvatarProps) {
         color: colors.color,
       }}
     >
-      {initial}
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={username}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div>{initial}</div>
+      )}
     </div>
   );
 }
