@@ -1,9 +1,13 @@
 import { usePosts } from "../../hooks/usePosts";
 import { PostCard } from "./PostCard";
+import { useModalStore } from "../../store/useModalStore";
 
 interface PostFeedProps {
   endpoint: string;
   title: string;
+}
+
+export function PostFeed({ endpoint, title }: PostFeedProps) {
   profileView?: boolean;
 }
 
@@ -15,6 +19,10 @@ export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
     isFetchingNextPage,
     isLoading,
     isError,
+  } = usePosts(endpoint);
+
+  const posts = data?.pages.flat() ?? [];
+  const openCreatePostModal = useModalStore((state) => state.openCreatePost);
     queryKey,
   } = usePosts(endpoint);
 
@@ -41,6 +49,11 @@ export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
           {title}
         </div>
         {!profileView && (
+          <button
+            onClick={openCreatePostModal}
+            className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px]
+             text-gold transition-colors hover:bg-bg-mid"
+          >
           <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
             + New post
           </button>
@@ -54,6 +67,7 @@ export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
       )}
 
       {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
         <PostCard key={post.id} post={post} queryKey={queryKey} />
       ))}
 

@@ -1,5 +1,6 @@
 import { apiFetch } from "./client";
 import type { RaceResponse, TagResponse } from "./lookup";
+import type { CreatePostFormValues } from "../validations/post";
 
 export interface PostResponse {
   id: number;
@@ -49,3 +50,10 @@ export async function toggleLikePost(postId: number, isLiked: boolean) {
     method: isLiked ? "DELETE" : "POST",
   });
 }
+
+export const createPost = (data: CreatePostFormValues) => {
+  return apiFetch<PostResponse>("/posts", {
+    method: "POST",
+    body: data,
+  });
+};
