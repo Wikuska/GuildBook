@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { getRaces } from '../../api/lookup';
+import { useQuery } from "@tanstack/react-query";
+import { fetchRaces } from "../../api/lookup";
 
 interface RaceSelectorProps {
   selectedRaceId: number;
@@ -7,14 +7,26 @@ interface RaceSelectorProps {
   error?: string;
 }
 
-export function RaceSelector({ selectedRaceId, onSelectRace, error }: RaceSelectorProps) {
-  const { data: races=[], isLoading, isError } = useQuery({
-    queryKey: ['races'],
-    queryFn: getRaces,
+export function RaceSelector({
+  selectedRaceId,
+  onSelectRace,
+  error,
+}: RaceSelectorProps) {
+  const {
+    data: races = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["races"],
+    queryFn: fetchRaces,
   });
 
-  if (isLoading) return <div className="mb-4 text-[11px] text-sage">Loading races...</div>;
-  if (isError) return <div className="mb-4 text-[11px] text-red-500">Failed to load races.</div>;
+  if (isLoading)
+    return <div className="mb-4 text-[11px] text-sage">Loading races...</div>;
+  if (isError)
+    return (
+      <div className="mb-4 text-[11px] text-red-500">Failed to load races.</div>
+    );
 
   return (
     <div className="mb-4">
@@ -29,8 +41,8 @@ export function RaceSelector({ selectedRaceId, onSelectRace, error }: RaceSelect
             onClick={() => onSelectRace(Number(race.id))}
             className={`cursor-pointer rounded border-[0.5px] px-1 py-1.75 text-center text-[11px] tracking-[0.5px] transition-all duration-150 ${
               selectedRaceId === race.id
-                ? 'border-gold bg-bg-surface text-gold'
-                : 'border-border-base bg-bg-deep text-sage hover:border-gold hover:text-gold'
+                ? "border-gold bg-bg-surface text-gold"
+                : "border-border-base bg-bg-deep text-sage hover:border-gold hover:text-gold"
             }`}
           >
             {race.name}
