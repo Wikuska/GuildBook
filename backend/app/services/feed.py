@@ -8,7 +8,7 @@ from app.models.user import User
 from app.services.post import build_post_responses, _normalize_ids
 from app.core.exceptions import InvalidCategoryFilterError, InvalidTagFilterError
 
-FEED_CATEGORY_IDS = [25, 27, 29]  
+FEED_CATEGORY_IDS = [25, 28, 29]  
 MARKET_CATEGORY_IDS = [26]            
 HELP_CATEGORY_IDS = [27]           
 CONTRACT_CATEGORY_IDS = [30]         

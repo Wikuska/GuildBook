@@ -10,6 +10,7 @@ export interface PostResponse {
     id: number;
     username: string;
     race: RaceResponse;
+    avatar_url: string | null;
   };
   category: {
     id: number;

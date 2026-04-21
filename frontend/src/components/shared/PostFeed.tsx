@@ -8,6 +8,10 @@ interface PostFeedProps {
 }
 
 export function PostFeed({ endpoint, title }: PostFeedProps) {
+  profileView?: boolean;
+}
+
+export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
   const {
     data,
     fetchNextPage,
@@ -19,6 +23,10 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
 
   const posts = data?.pages.flat() ?? [];
   const openCreatePostModal = useModalStore((state) => state.openCreatePost);
+    queryKey,
+  } = usePosts(endpoint);
+
+  const posts = data?.pages.flat() ?? [];
 
   if (isLoading)
     return (
@@ -46,6 +54,7 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
             className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px]
              text-gold transition-colors hover:bg-bg-mid"
           >
+          <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
             + New post
           </button>
         )}
@@ -59,6 +68,7 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
 
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} post={post} queryKey={queryKey} />
       ))}
 
       {hasNextPage && (
