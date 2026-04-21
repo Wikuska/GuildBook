@@ -1,27 +1,38 @@
-import { usePosts } from "../../hooks/usePosts"
-import { PostCard } from "./PostCard"
+import { usePosts } from "../../hooks/usePosts";
+import { PostCard } from "./PostCard";
+import { useModalStore } from "../../store/useModalStore";
 
 interface PostFeedProps {
-    endpoint: string
-    title: string
+  endpoint: string;
+  title: string;
 }
 
 export function PostFeed({ endpoint, title }: PostFeedProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = usePosts(endpoint)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = usePosts(endpoint);
 
-  const posts = data?.pages.flat() ?? []
+  const posts = data?.pages.flat() ?? [];
+  const openCreatePostModal = useModalStore((state) => state.openCreatePost);
 
-  if (isLoading) return (
-    <div className="flex flex-1 items-center justify-center text-text-dim text-xs tracking-widest uppercase">
-      Gathering scrolls...
-    </div>
-  )
+  if (isLoading)
+    return (
+      <div className="flex flex-1 items-center justify-center text-text-dim text-xs tracking-widest uppercase">
+        Gathering scrolls...
+      </div>
+    );
 
-  if (isError) return (
-    <div className="flex flex-1 items-center justify-center text-text-dim text-xs tracking-widest uppercase">
-      Failed to read the scrolls.
-    </div>
-  )
+  if (isError)
+    return (
+      <div className="flex flex-1 items-center justify-center text-text-dim text-xs tracking-widest uppercase">
+        Failed to read the scrolls.
+      </div>
+    );
 
   return (
     <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-5">
@@ -29,9 +40,15 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[1.5px] text-text-dim before:h-1 before:w-1 before:shrink-0 before:rotate-45 before:bg-gold">
           {title}
         </div>
-        <button className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px] text-gold transition-colors hover:bg-bg-mid">
-          + New post
-        </button>
+        {!profileView && (
+          <button
+            onClick={openCreatePostModal}
+            className="relative rounded border border-gold bg-bg-surface px-3 py-1.5 text-[11px] uppercase tracking-[1px]
+             text-gold transition-colors hover:bg-bg-mid"
+          >
+            + New post
+          </button>
+        )}
       </div>
 
       {posts.length === 0 && (
@@ -40,7 +57,7 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
         </div>
       )}
 
-      {posts.map(post => (
+      {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
 
@@ -54,5 +71,5 @@ export function PostFeed({ endpoint, title }: PostFeedProps) {
         </button>
       )}
     </div>
-  )
+  );
 }

@@ -1,0 +1,222 @@
+import { useEffect } from "react";
+import { useModalStore } from "../../store/useModalStore";
+import { createPortal } from "react-dom";
+import { createPostSchema } from "../../validations/post";
+import type { CreatePostFormValues } from "../../validations/post";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
+import { Input } from "../ui/Input";
+import { Select } from "../ui/Select";
+import { useCategories } from "../../hooks/useCategories";
+import { useTags } from "../../hooks/useTags";
+import { useRaces } from "../../hooks/useRaces";
+import { MultiSelect } from "../ui/MultiSelect";
+import { cn } from "../../utils";
+import { useCreatePost } from "../../hooks/useCreatePost";
+
+export const CreatePostModal = () => {
+  const { isCreatePostOpen, closeCreatePost } = useModalStore();
+  const { data: categories = [], isLoading: isCategoriesLoading } =
+    useCategories();
+  const { data: races = [], isLoading: isRacesLoading } = useRaces();
+  const { data: tags = [], isLoading: isTagsLoading } = useTags();
+  const allRaceIds = races.map((r) => r.id);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CreatePostFormValues>({
+    resolver: zodResolver(createPostSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      category_id: undefined,
+      visible_race_ids: [],
+      tag_ids: [],
+    },
+  });
+
+  const createPostMutation = useCreatePost(allRaceIds, () => {
+    reset();
+    closeCreatePost();
+  });
+
+  useEffect(() => {
+    if (!isCreatePostOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCreatePost();
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCreatePostOpen, closeCreatePost]);
+
+  if (!isCreatePostOpen) return null;
+
+  const onSubmit = (data: CreatePostFormValues) => {
+    createPostMutation.mutate(data);
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+        onClick={closeCreatePost}
+      />
+
+      <div className="relative w-full max-w-2xl bg-bg-surface border border-border-accent p-6 sm:p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-y-auto max-h-[90vh] rounded-sm flex flex-col">
+        <button
+          onClick={() => {
+            reset();
+            closeCreatePost();
+          }}
+          className="absolute top-4 right-4 text-text-dim hover:text-gold transition-colors uppercase text-[10px] tracking-[2px]"
+        >
+          [ Close ]
+        </button>
+
+        <h2 className="text-gold uppercase tracking-[2px] text-lg mb-6 border-b border-border-accent pb-2">
+          New Chronicle Entry
+        </h2>
+
+        <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
+          <Input
+            label="Scroll title"
+            placeholder="Enter a title..."
+            containerClassName="mb-0"
+            className="bg-bg-base border-border-accent text-text-mid rounded-sm p-3"
+            error={errors.title?.message}
+            {...register("title")}
+          />
+
+          <div className="flex flex-col gap-2">
+            <label className="block text-[11px] uppercase tracking-[1.5px] text-text-mid">
+              Content
+            </label>
+            <textarea
+              {...register("content")}
+              className={cn(
+                "bg-bg-base border text-[14px] border-border-accent text-text-mid p-3 rounded-sm min-h-37.5 resize-y focus:border-gold focus:outline-none transition-colors",
+                errors.content ? "border-red-500" : "",
+              )}
+              placeholder="Describe your tale..."
+            />
+            {errors.content && (
+              <span className="text-red-500 text-[11px]">
+                {errors.content.message}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Controller
+              control={control}
+              name="category_id"
+              render={({ field }) => (
+                <Select
+                  label="Category"
+                  placeholder="Select a category..."
+                  containerClassName="mb-0"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={categories.map((cat) => ({
+                    id: cat.id,
+                    name: cat.name,
+                  }))}
+                  error={errors.category_id?.message}
+                  isLoading={isCategoriesLoading}
+                />
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="visible_race_ids"
+                render={({ field }) => {
+                  const handleRaceChange = (newValues: number[]) => {
+                    const allSelected = newValues.includes(0);
+                    const previouslyAllSelected = field.value.includes(0);
+
+                    if (allSelected && !previouslyAllSelected) {
+                      field.onChange([0]);
+                    } else {
+                      field.onChange(newValues.filter((v) => v !== 0));
+                    }
+                  };
+
+                  return (
+                    <MultiSelect
+                      label="Visible to Races"
+                      values={field.value}
+                      onChange={handleRaceChange}
+                      options={[
+                        { id: 0, name: "All races (public)" },
+                        ...races.map((r) => ({ id: r.id, name: r.name })),
+                      ]}
+                      error={errors.visible_race_ids?.message}
+                      isLoading={isRacesLoading}
+                    />
+                  );
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Controller
+                control={control}
+                name="tag_ids"
+                render={({ field }) => (
+                  <MultiSelect
+                    label="Tags"
+                    containerClassName="mb-0"
+                    values={field.value}
+                    onChange={field.onChange}
+                    options={tags.map((tag) => ({
+                      id: tag.id,
+                      name: tag.name,
+                    }))}
+                    error={errors.tag_ids?.message}
+                    isLoading={isTagsLoading}
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end items-center gap-4 pt-4 mt-2 border-t border-border-accent">
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+                closeCreatePost();
+              }}
+              className="text-text-dim hover:text-text-mid transition-colors uppercase text-[13px] tracking-[1.5px]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || createPostMutation.isPending}
+              className="bg-bg-surface border border-gold text-gold hover:bg-bg-hover transition-colors px-6 py-2 uppercase tracking-[2px] text-[13px] rounded-sm disabled:opacity-50"
+            >
+              Publish
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>,
+    document.body,
+  );
+};
