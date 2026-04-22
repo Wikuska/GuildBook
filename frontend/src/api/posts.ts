@@ -19,6 +19,7 @@ export interface PostResponse {
   };
   created_at: string;
   tags: TagResponse[];
+  visible_races: RaceResponse[];
   likes_count: number;
   comments_count: number;
   is_liked_by_current_user: boolean;

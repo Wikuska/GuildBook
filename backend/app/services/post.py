@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import User, Post
-from app.schemas.post import CreatePostRequest, PostResponse, TagResponse, CategoryResponse, AuthorResponse
+from app.schemas.post import CreatePostRequest, PostResponse, RaceResponse, TagResponse, CategoryResponse, AuthorResponse
 from app.crud import post as post_crud
 from app.crud import category as category_crud
 from app.crud import tag as tag_crud
@@ -41,6 +41,7 @@ def _build_post_response(
         category=CategoryResponse.model_validate(post.category),
         created_at=post.created_at,
         tags=[TagResponse.model_validate(tag) for tag in post.tags],
+        visible_races=[RaceResponse.model_validate(race) for race in post.visible_races],
         likes_count=likes_count,
         comments_count=comments_count,
         is_liked_by_current_user=is_liked_by_current_user,
