@@ -6,24 +6,33 @@ import { Link } from "react-router-dom";
 import type { QueryKey } from "@tanstack/query-core";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Swords, Feather } from "lucide-react";
+import { useDeletePost } from "../../hooks/useDeletePost";
+import { useState } from "react";
+import { useModalStore } from "../../store/useModalStore";
 
-export function PostCard({
-  post,
-  queryKey,
-}: {
+interface PostCardProps {
   post: PostResponse;
   queryKey: QueryKey;
-}) {
+}
+
+export function PostCard({ post, queryKey }: PostCardProps) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   const { mutate: toggleLike } = useToggleLike(
     post.id,
     post.is_liked_by_current_user,
     queryKey,
   );
+
+  const deletePostMutation = useDeletePost(queryKey);
+  const openEditModal = useModalStore((state) => state.openEditPost);
+
   const { data: user } = useCurrentUser();
   const isAuthor = user?.id === post.author.id;
 
   return (
     <article
+      onMouseLeave={() => setConfirmDelete(false)}
       className={`group relative cursor-pointer rounded bg-bg-mid p-4 transition-colors hover:border-border-accent
         before:absolute before:-left-px before:-top-px before:h-2 before:w-2 before:rounded-tl-[1px] before:border-l before:border-t
         after:absolute after:-bottom-px after:-right-px after:h-2 after:w-2 after:rounded-br-[1px] after:border-b after:border-r
@@ -68,12 +77,41 @@ export function PostCard({
             className="hidden group-hover:flex items-center gap-1.5"
             onClick={(e) => e.stopPropagation()}
           >
-            <button className="text-text-dim hover:text-gold transition-colors">
+            <button
+              onClick={() => openEditModal(post)}
+              className="text-text-dim hover:text-gold transition-colors"
+            >
               <Feather className="w-3.5 h-3.5" />
             </button>
-            <button className="text-text-dim hover:text-red-400 transition-colors">
-              <Swords className="w-3.5 h-3.5" />
-            </button>
+
+            {confirmDelete ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("Deleting post with ID:", post.id); // Log the post ID being deleted
+                    deletePostMutation.mutate(post.id);
+                  }}
+                  className="text-[10px] uppercase tracking-[1px] text-red-400 hover:text-red-300 transition-colors"
+                >
+                  confirm
+                </button>
+                <span className="text-border-accent">·</span>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="text-[10px] uppercase tracking-[1px] text-text-dim hover:text-text-mid transition-colors"
+                >
+                  cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="text-text-dim hover:text-red-400 transition-colors"
+              >
+                <Swords className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         )}
       </div>

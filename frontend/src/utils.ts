@@ -21,12 +21,3 @@ export function formatMembershipDate(dateStr: string): string {
     year: "numeric",
   }).format(date);
 }
-
-export const toExcludedRaces = (
-  visibleIds: number[],
-  allRaceIds: number[],
-): number[] => {
-  if (visibleIds.includes(0)) return [];
-  if (visibleIds.length === allRaceIds.length) return [];
-  return allRaceIds.filter((id) => !visibleIds.includes(id));
-};
