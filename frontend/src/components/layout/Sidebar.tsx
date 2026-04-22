@@ -1,5 +1,5 @@
 import { Avatar } from "../ui/Avatar";
-import { useFilterStore } from "../../store/filterStore";
+import { useFilterStore } from "../../store/FilterStore";
 import { useTags } from "../../hooks/useTags";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 

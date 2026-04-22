@@ -12,3 +12,6 @@ export const createPostSchema = z.object({
 });
 
 export type CreatePostFormValues = z.infer<typeof createPostSchema>;
+
+export const updatePostSchema = createPostSchema.partial();
+export type UpdatePostFormValues = z.infer<typeof updatePostSchema>;

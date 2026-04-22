@@ -3,20 +3,20 @@
 
 @theme {
   --color-gold: #c9a84c;
-  --color-sage: #bcb88a;
-  --color-parchment: #d4c4a0;
+  --color-sage: #c4be8c;
+  --color-parchment: #e8d8b0;
 
-  --color-bg-deep: #0e0c0a;
-  --color-bg-mid: #100e0b;
-  --color-bg-surface: #1a1408;
-  --color-bg-hover: #2a2010;
-  --color-bg-input: #0a0906;
+  --color-bg-deep: #18140c;
+  --color-bg-mid: #1e1a10;
+  --color-bg-surface: #261e10;
+  --color-bg-hover: #302616;
+  --color-bg-input: #12100a;
 
-  --color-border-base: #2a2520;
-  --color-border-accent: #3d3428;
+  --color-border-base: #3a3220;
+  --color-border-accent: #4e4228;
 
-  --color-text-dim: #544a33;
-  --color-text-mid: #8a7a58;
+  --color-text-dim: #8a7a54;
+  --color-text-mid: #c0ae80;
 }
 
 [data-sonner-toast] {

@@ -4,6 +4,8 @@ import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
 import { Link } from "react-router-dom";
 import type { QueryKey } from "@tanstack/query-core";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { Swords, Feather } from "lucide-react";
 
 export function PostCard({
   post,
@@ -17,6 +19,8 @@ export function PostCard({
     post.is_liked_by_current_user,
     queryKey,
   );
+  const { data: user } = useCurrentUser();
+  const isAuthor = user?.id === post.author.id;
 
   return (
     <article
@@ -34,7 +38,7 @@ export function PostCard({
         <Link
           to={`/profile/${post.author.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="mb-2.5 flex items-center gap-2"
+          className="flex items-center gap-2 flex-1"
         >
           <Avatar
             username={post.author.username}
@@ -55,16 +59,31 @@ export function PostCard({
               {post.author.race.name}
             </div>
           </div>
-          <span className="text-[11px] text-text-dim">
-            {formatTime(post.created_at)}
-          </span>
         </Link>
+        <span className="text-[11px] text-text-dim">
+          {formatTime(post.created_at)}
+        </span>
+        {isAuthor && (
+          <div
+            className="hidden group-hover:flex items-center gap-1.5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="text-text-dim hover:text-gold transition-colors">
+              <Feather className="w-3.5 h-3.5" />
+            </button>
+            <button className="text-text-dim hover:text-red-400 transition-colors">
+              <Swords className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
-      <div className="mb-1.5 text-sm font-medium leading-[1.4] text-parchment">
-        {post.title}
-      </div>
-      <div className="mb-2.5 text-[13px] leading-[1.6] text-text-mid line-clamp-3">
-        {post.content}
+      <div className="my-3 flex flex-col gap-1.5">
+        <h3 className="text-base font-semibold tracking-wide text-parchment sm:text-lg">
+          {post.title}
+        </h3>
+        <p className="text-[13px] leading-[1.6] text-text-mid line-clamp-4">
+          {post.content}
+        </p>
       </div>
       <div className="relative mb-2 h-px bg-border-base after:absolute after:-top-0.75 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rotate-45 after:bg-border-accent" />
       <div className="flex items-center">

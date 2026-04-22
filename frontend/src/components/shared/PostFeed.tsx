@@ -39,7 +39,7 @@ export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
   return (
     <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-5">
       <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[1.5px] text-text-dim before:h-1 before:w-1 before:shrink-0 before:rotate-45 before:bg-gold">
+        <div className="flex items-center gap-1.5 text-[15px] uppercase tracking-[1.5px] text-text-dim before:h-1 before:w-1 before:shrink-0 before:rotate-45 before:bg-gold">
           {title}
         </div>
         {!profileView && (
