@@ -44,7 +44,7 @@ export function useToggleLike(
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 }

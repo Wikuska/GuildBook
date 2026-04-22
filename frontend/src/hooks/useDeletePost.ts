@@ -1,19 +1,20 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type QueryKey,
+} from "@tanstack/react-query";
 import { deletePost } from "../api/posts";
-import { useLocation } from "react-router-dom";
 
-export const useDeletePost = () => {
+export const useDeletePost = (queryKey: QueryKey) => {
   const queryClient = useQueryClient();
-  const { pathname } = useLocation();
-  const endpoint = pathname.slice(1);
 
   return useMutation({
     mutationFn: (postId: number) => deletePost(postId),
     onMutate: async (postId) => {
-      await queryClient.cancelQueries({ queryKey: [endpoint] });
-      const previous = queryClient.getQueryData([endpoint]);
+      await queryClient.cancelQueries({ queryKey: queryKey });
+      const previous = queryClient.getQueryData(queryKey);
 
-      queryClient.setQueryData([endpoint], (old: any) => ({
+      queryClient.setQueryData(queryKey, (old: any) => ({
         ...old,
         pages: old.pages.map((page: any) =>
           page.filter((p: any) => p.id !== postId),
@@ -23,7 +24,11 @@ export const useDeletePost = () => {
       return { previous };
     },
     onError: (_err, _postId, context) => {
-      queryClient.setQueryData([endpoint], context?.previous);
+      queryClient.setQueryData(queryKey, context?.previous);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 };

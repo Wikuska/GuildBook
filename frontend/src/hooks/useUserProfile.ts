@@ -4,7 +4,7 @@ import type { PublicUserResponse } from "../api/users";
 
 export function useUserProfile(id: string | undefined) {
   return useQuery<PublicUserResponse>({
-    queryKey: ["profile", String(id)],
+    queryKey: ["users", "profile", String(id)],
     queryFn: () => fetchUserProfile({ id: id! }),
     enabled: !!id,
   });
