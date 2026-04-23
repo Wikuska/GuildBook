@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useModalStore } from "../../store/useModalStore";
+import { usePostFormStore } from "../../store/usePostFormStore";
 import { createPortal } from "react-dom";
 import { createPostSchema } from "../../validations/post";
 import type {
@@ -19,7 +19,7 @@ import { useCreatePost } from "../../hooks/useCreatePost";
 import { useUpdatePost } from "../../hooks/useUpdatePost";
 
 export const CreatePostModal = () => {
-  const { isCreatePostOpen, closeCreatePost, editingPost } = useModalStore();
+  const { isCreatePostOpen, closeCreatePost, editingPost } = usePostFormStore();
   const isEditing = !!editingPost;
 
   const { data: categories = [], isLoading: isCategoriesLoading } =

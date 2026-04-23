@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { PostResponse } from "../api/posts";
 
-interface ModalStore {
+interface PostFormStore {
   isCreatePostOpen: boolean;
   editingPost: PostResponse | null;
   openCreatePost: () => void;
@@ -9,7 +9,7 @@ interface ModalStore {
   closeCreatePost: () => void;
 }
 
-export const useModalStore = create<ModalStore>((set) => ({
+export const usePostFormStore = create<PostFormStore>((set) => ({
   isCreatePostOpen: false,
   editingPost: null,
   openCreatePost: () => set({ isCreatePostOpen: true, editingPost: null }),

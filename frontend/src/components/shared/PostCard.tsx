@@ -8,7 +8,7 @@ import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Swords, Feather } from "lucide-react";
 import { useDeletePost } from "../../hooks/useDeletePost";
 import { useState } from "react";
-import { useModalStore } from "../../store/useModalStore";
+import { usePostFormStore } from "../../store/usePostFormStore";
 
 interface PostCardProps {
   post: PostResponse;
@@ -25,7 +25,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
   );
 
   const deletePostMutation = useDeletePost(queryKey);
-  const openEditModal = useModalStore((state) => state.openEditPost);
+  const openEditModal = usePostFormStore((state) => state.openEditPost);
 
   const { data: user } = useCurrentUser();
   const isAuthor = user?.id === post.author.id;
