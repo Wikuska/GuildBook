@@ -17,6 +17,7 @@ import { MultiSelect } from "../ui/MultiSelect";
 import { cn } from "../../utils";
 import { useCreatePost } from "../../hooks/useCreatePost";
 import { useUpdatePost } from "../../hooks/useUpdatePost";
+import { useModalOverlay } from "../../hooks/useModalOverlay";
 
 export const CreatePostModal = () => {
   const { isCreatePostOpen, closeCreatePost, editingPost } = usePostFormStore();
@@ -52,6 +53,8 @@ export const CreatePostModal = () => {
   const createPostMutation = useCreatePost(handleSuccess);
   const updatePostMutation = useUpdatePost(handleSuccess);
 
+  useModalOverlay(isCreatePostOpen, closeCreatePost);
+
   useEffect(() => {
     if (!isCreatePostOpen) return;
 
@@ -76,22 +79,6 @@ export const CreatePostModal = () => {
       });
     }
   }, [isCreatePostOpen, editingPost]);
-
-  useEffect(() => {
-    if (!isCreatePostOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeCreatePost();
-    };
-
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = "unset";
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isCreatePostOpen, closeCreatePost]);
 
   if (!isCreatePostOpen) return null;
 
