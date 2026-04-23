@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
 import { CreatePostModal } from "../modals/CreatePostModal";
+import { PostViewModal } from "../modals/PostViewModal";
 
 export function AppLayout() {
   return (
@@ -13,6 +14,7 @@ export function AppLayout() {
           <Outlet />
         </main>
         <CreatePostModal />
+        <PostViewModal />
       </div>
     </div>
   );

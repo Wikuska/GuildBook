@@ -9,6 +9,7 @@ import { Swords, Feather } from "lucide-react";
 import { useDeletePost } from "../../hooks/useDeletePost";
 import { useState } from "react";
 import { usePostFormStore } from "../../store/usePostFormStore";
+import { usePostViewStore } from "../../store/usePostViewStore";
 
 interface PostCardProps {
   post: PostResponse;
@@ -26,6 +27,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
 
   const deletePostMutation = useDeletePost(queryKey);
   const openEditModal = usePostFormStore((state) => state.openEditPost);
+  const openViewModal = usePostViewStore((state) => state.openPost);
 
   const { data: user } = useCurrentUser();
   const isAuthor = user?.id === post.author.id;
@@ -33,6 +35,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
   return (
     <article
       onMouseLeave={() => setConfirmDelete(false)}
+      onClick={() => openViewModal(post.id, queryKey)}
       className={`group relative cursor-pointer rounded bg-bg-mid p-4 transition-colors hover:border-border-accent
         before:absolute before:-left-px before:-top-px before:h-2 before:w-2 before:rounded-tl-[1px] before:border-l before:border-t
         after:absolute after:-bottom-px after:-right-px after:h-2 after:w-2 after:rounded-br-[1px] after:border-b after:border-r
@@ -47,7 +50,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
         <Link
           to={`/profile/${post.author.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-2 flex-1"
+          className="flex items-center gap-2"
         >
           <Avatar
             username={post.author.username}
@@ -69,9 +72,12 @@ export function PostCard({ post, queryKey }: PostCardProps) {
             </div>
           </div>
         </Link>
-        <span className="text-[11px] text-text-dim">
+
+        {/* Zmiana tutaj: dodane ml-auto */}
+        <span className="ml-auto text-[11px] text-text-dim">
           {formatTime(post.created_at)}
         </span>
+
         {isAuthor && (
           <div
             className="hidden group-hover:flex items-center gap-1.5"
@@ -89,7 +95,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log("Deleting post with ID:", post.id); // Log the post ID being deleted
+                    console.log("Deleting post with ID:", post.id);
                     deletePostMutation.mutate(post.id);
                   }}
                   className="text-[10px] uppercase tracking-[1px] text-red-400 hover:text-red-300 transition-colors"
@@ -169,6 +175,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
                 strokeWidth="1"
                 fill="none"
                 className="transition-colors group-hover/btn:stroke-muted"
+                onClick={() => openViewModal(post.id, queryKey)}
               />
             </svg>
             <span>{post.comments_count}</span>
