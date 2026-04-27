@@ -1,7 +1,7 @@
 import { Avatar } from "../ui/Avatar";
 import { useFilterStore } from "../../store/FilterStore";
-import { useTags } from "../../hooks/useTags";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useTags } from "../../hooks/lookup";
+import { useCurrentUser } from "../../hooks/user";
 
 function TagButton({
   label,

@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchPosts } from "../api/posts";
-import { useFilterStore } from "../store/FilterStore";
+import { fetchPosts } from "../../api/posts";
+import { useFilterStore } from "../../store/FilterStore";
 
 const LIMIT = 10;
 

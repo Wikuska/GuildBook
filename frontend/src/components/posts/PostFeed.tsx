@@ -1,4 +1,4 @@
-import { usePosts } from "../../hooks/usePosts";
+import { usePosts } from "../../hooks/posts";
 import { PostCard } from "./PostCard";
 import { usePostFormStore } from "../../store/usePostFormStore";
 

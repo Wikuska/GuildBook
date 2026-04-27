@@ -1,4 +1,4 @@
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useCurrentUser } from "../../hooks/user";
 import { Avatar } from "../ui/Avatar";
 import { Bell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";

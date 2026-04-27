@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchFeedProfile } from "../api/auth";
-import { useAuthStore } from "../store/authStore";
+import { fetchFeedProfile } from "../../api/auth";
+import { useAuthStore } from "../../store/authStore";
 
 export function useCurrentUser() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);

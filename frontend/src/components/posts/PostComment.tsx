@@ -2,8 +2,7 @@ import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
 import { Swords, Feather, Check, X } from "lucide-react";
 import { useState } from "react";
-import { useDeleteComment } from "../../hooks/useDeleteComment";
-import { useUpdateComment } from "../../hooks/useUpdateComment";
+import { useDeleteComment, useUpdateComment } from "../../hooks/comments";
 
 interface Comment {
   id: number;

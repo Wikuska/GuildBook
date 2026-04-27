@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
-import { toggleLikePost } from "../api/posts";
+import { toggleLikePost } from "../../api/posts";
 
 export function useToggleLike(
   postId: number,

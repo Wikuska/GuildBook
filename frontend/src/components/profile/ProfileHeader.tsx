@@ -1,7 +1,7 @@
 import { Avatar } from "../ui/Avatar";
 import type { PublicUserResponse } from "../../api/users";
 import { formatMembershipDate } from "../../utils";
-import { useToggleFollow } from "../../hooks/useToggleFollow";
+import { useToggleFollow } from "../../hooks/user/useToggleFollow";
 
 interface ProfileHeaderProps {
   profile: PublicUserResponse;

@@ -3,8 +3,8 @@ import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { ProfileRightPanel } from "../components/profile/ProfileRightPanel";
 import { PostFeed } from "../components/posts/PostFeed";
 import { useParams } from "react-router-dom";
-import { useCurrentUser } from "../hooks/useCurrentUser";
-import { useUserProfile } from "../hooks/useUserProfile";
+import { useCurrentUser } from "../hooks/user";
+import { useUserProfile } from "../hooks/user/useUserProfile";
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>();

@@ -10,14 +10,11 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { useCategories } from "../../hooks/useCategories";
-import { useTags } from "../../hooks/useTags";
-import { useRaces } from "../../hooks/useRaces";
+import { useCategories, useTags, useRaces } from "../../hooks/lookup";
 import { MultiSelect } from "../ui/MultiSelect";
 import { cn } from "../../utils";
-import { useCreatePost } from "../../hooks/useCreatePost";
-import { useUpdatePost } from "../../hooks/useUpdatePost";
-import { useModalOverlay } from "../../hooks/useModalOverlay";
+import { useCreatePost, useUpdatePost } from "../../hooks/posts";
+import { useModalOverlay } from "../../hooks/ui/useModalOverlay";
 
 export const CreatePostModal = () => {
   const { isCreatePostOpen, closeCreatePost, editingPost } = usePostFormStore();

@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
-import { deletePost } from "../api/posts";
+import { deletePost } from "../../api/posts";
 
 export const useDeletePost = (queryKey: QueryKey) => {
   const queryClient = useQueryClient();

@@ -2,15 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { X } from "lucide-react";
 import { usePostViewStore } from "../../store/usePostViewStore";
-import { usePost } from "../../hooks/usePost";
-import { useComments } from "../../hooks/useComments";
-import { useSubmitComment } from "../../hooks/useSubmitComment";
-import { useToggleLike } from "../../hooks/useToggleLike";
+import { usePost } from "../../hooks/posts";
+import { useComments, useSubmitComment } from "../../hooks/comments";
+import { useToggleLike } from "../../hooks/likes";
 import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
-import { useModalOverlay } from "../../hooks/useModalOverlay";
+import { useModalOverlay } from "../../hooks/ui/useModalOverlay";
 import { PostComment } from "../posts/PostComment";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useCurrentUser } from "../../hooks/user";
 
 export function PostViewModal() {
   const { openPostId, feedQueryKey, closePost } = usePostViewStore();

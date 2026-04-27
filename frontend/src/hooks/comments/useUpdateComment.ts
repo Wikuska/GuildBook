@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateComment } from "../api/comments";
+import { updateComment } from "../../api/comments";
 
 export function useUpdateComment(postId: number) {
   const queryClient = useQueryClient();

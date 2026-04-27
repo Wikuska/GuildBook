@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchRaces } from "../api/lookup";
+import { fetchRaces } from "../../api/lookup";
 
 export const useRaces = () =>
   useQuery({
