@@ -3,6 +3,7 @@ import { formatTime } from "../../utils";
 import { Swords, Feather, Check, X } from "lucide-react";
 import { useState } from "react";
 import { useDeleteComment, useUpdateComment } from "../../hooks/comments";
+import { Link } from "react-router-dom";
 
 interface Comment {
   id: number;
@@ -64,17 +65,26 @@ export function PostComment({
       className="group flex gap-2.5"
       onMouseLeave={() => setConfirmDelete(false)}
     >
-      <Avatar
-        username={comment.author.username}
-        avatarUrl={comment.author.avatar_url}
-        raceName={comment.author.race.name}
-        size="sm"
-      />
+      <Link
+        to={`/profile/${comment.author.id}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Avatar
+          username={comment.author.username}
+          avatarUrl={comment.author.avatar_url}
+          raceName={comment.author.race.name}
+          size="sm"
+        />
+      </Link>
       <div className="flex-1 rounded bg-bg-surface border border-border-accent px-3 py-2">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[12px] font-medium text-parchment">
+          <Link
+            to={`/profile/${comment.author.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="text-[12px] font-medium text-parchment hover:text-gold transition-colors"
+          >
             {comment.author.username}
-          </span>
+          </Link>
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-text-dim">
               {formatTime(comment.created_at)}

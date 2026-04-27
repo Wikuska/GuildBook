@@ -59,7 +59,7 @@ export function PostCard({ post, queryKey }: PostCardProps) {
             size="sm"
           />
           <div className="flex-1">
-            <div className="flex items-center gap-1.5 text-[13px] font-medium text-parchment">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-parchment hover:text-gold transition-colors">
               {post.author.username}
               {post.is_followed_author && (
                 <span className="rounded-[3px] border border-border-accent bg-bg-surface px-1.5 py-px text-[10px] tracking-[0.5px] text-sage">
