@@ -19,3 +19,16 @@ export const createComment = (postId: number, content: string) => {
     body: { content },
   });
 };
+
+export const deleteComment = (commentId: number) => {
+  return apiFetch(`/comments/${commentId}`, {
+    method: "DELETE",
+  });
+};
+
+export const updateComment = (commentId: number, content: string) => {
+  return apiFetch(`/comments/${commentId}`, {
+    method: "PUT",
+    body: { content },
+  });
+};

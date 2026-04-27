@@ -9,9 +9,12 @@ import { useToggleLike } from "../../hooks/useToggleLike";
 import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
 import { useModalOverlay } from "../../hooks/useModalOverlay";
+import { PostComment } from "../posts/PostComment";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 export function PostViewModal() {
   const { openPostId, feedQueryKey, closePost } = usePostViewStore();
+  const { data: user } = useCurrentUser();
   const [commentText, setCommentText] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -195,27 +198,12 @@ export function PostViewModal() {
                     </p>
                   ) : (
                     comments.map((comment) => (
-                      <div key={comment.id} className="flex gap-2.5">
-                        <Avatar
-                          username={comment.author.username}
-                          avatarUrl={comment.author.avatar_url}
-                          raceName={comment.author.race.name}
-                          size="sm"
-                        />
-                        <div className="flex-1 rounded bg-bg-surface border border-border-accent px-3 py-2">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[12px] font-medium text-parchment">
-                              {comment.author.username}
-                            </span>
-                            <span className="text-[10px] text-text-dim">
-                              {formatTime(comment.created_at)}
-                            </span>
-                          </div>
-                          <p className="text-[12px] leading-[1.6] text-text-mid">
-                            {comment.content}
-                          </p>
-                        </div>
-                      </div>
+                      <PostComment
+                        key={comment.id}
+                        comment={comment}
+                        postId={post.id}
+                        currentUserId={user?.id}
+                      />
                     ))
                   )}
                 </div>
