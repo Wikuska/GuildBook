@@ -4,7 +4,7 @@ import { type QueryKey } from "@tanstack/react-query";
 interface PostViewStore {
   openPostId: number | null;
   feedQueryKey: QueryKey | null;
-  openPost: (id: number, queryKey: QueryKey) => void;
+  openPost: (id: number, queryKey: QueryKey | null) => void;
   closePost: () => void;
 }
 
