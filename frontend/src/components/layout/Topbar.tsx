@@ -86,9 +86,9 @@ export function Topbar() {
 
           {isOpen && (
             <div
-              className="absolute right-0 top-10 z-50 w-80 rounded bg-bg-mid border border-border-base overflow-hidden
-              before:absolute before:-top-px before:-left-px before:h-2.5 before:w-2.5 before:border-l before:border-t before:border-gold
-              after:absolute after:-bottom-px after:-right-px after:h-2.5 after:w-2.5 after:border-r after:border-b after:border-gold"
+              className="absolute right-0 top-10 z-50 w-80 rounded bg-bg-mid border border-border-base overflow-hidden shadow-2xl shadow-black/80 ring-1 ring-black/40
+    before:absolute before:-top-px before:-left-px before:h-2.5 before:w-2.5 before:border-l before:border-t before:border-gold
+    after:absolute after:-bottom-px after:-right-px after:h-2.5 after:w-2.5 after:border-r after:border-b after:border-gold"
             >
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-border-base">
                 <div className="flex items-center gap-1.5">
