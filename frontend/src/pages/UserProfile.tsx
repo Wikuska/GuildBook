@@ -1,7 +1,7 @@
 import { ProfileBanner } from "../components/profile/ProfileBanner";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { ProfileRightPanel } from "../components/profile/ProfileRightPanel";
-import { PostFeed } from "../components/shared/PostFeed";
+import { PostFeed } from "../components/posts/PostFeed";
 import { useParams } from "react-router-dom";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useUserProfile } from "../hooks/useUserProfile";

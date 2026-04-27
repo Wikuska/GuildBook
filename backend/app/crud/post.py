@@ -115,6 +115,7 @@ def get_feed_posts(
         .options(
             joinedload(Post.author).joinedload(User.race),
             joinedload(Post.category),
+            joinedload(Post.visible_races),
             selectinload(Post.tags),
         )
         .filter(visibility)

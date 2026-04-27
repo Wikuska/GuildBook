@@ -1,13 +1,13 @@
-import { useQuery } from "@tanstack/react-query"
-import { fetchFeedProfile } from "../api/auth"
-import { useAuthStore } from "../store/authStore"
+import { useQuery } from "@tanstack/react-query";
+import { fetchFeedProfile } from "../api/auth";
+import { useAuthStore } from "../store/authStore";
 
 export function useCurrentUser() {
-  const isAuthenticated = useAuthStore(s => s.isAuthenticated)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return useQuery({
-    queryKey: ['currentUser'],
+    queryKey: ["users", "current"],
     queryFn: fetchFeedProfile,
     enabled: isAuthenticated,
-  })
+  });
 }

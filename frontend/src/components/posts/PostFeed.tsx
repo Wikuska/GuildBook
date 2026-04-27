@@ -1,6 +1,6 @@
 import { usePosts } from "../../hooks/usePosts";
 import { PostCard } from "./PostCard";
-import { useModalStore } from "../../store/useModalStore";
+import { usePostFormStore } from "../../store/usePostFormStore";
 
 interface PostFeedProps {
   endpoint: string;
@@ -20,7 +20,7 @@ export function PostFeed({ endpoint, title, profileView }: PostFeedProps) {
   } = usePosts(endpoint);
 
   const posts = data?.pages.flat() ?? [];
-  const openCreatePostModal = useModalStore((state) => state.openCreatePost);
+  const openCreatePostModal = usePostFormStore((state) => state.openCreatePost);
 
   if (isLoading)
     return (

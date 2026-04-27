@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+from app.schemas.post import AuthorResponse
 
 
 class CreateCommentRequest(BaseModel):
@@ -11,7 +12,7 @@ class UpdateCommentRequest(BaseModel):
 class CommentResponse(BaseModel):
     id: int
     content: str
-    author_id: int
+    author: AuthorResponse
     post_id: int
     created_at: datetime
 

@@ -6,7 +6,8 @@ const LIMIT = 10;
 
 export function usePosts(endpoint: string) {
   const selectedTag = useFilterStore((s) => s.selectedTag);
-  const queryKey = [endpoint, selectedTag?.id ?? null];
+  const boardName = endpoint.split("/").pop();
+  const queryKey = ["posts", boardName, selectedTag?.id ?? null];
 
   return {
     queryKey,

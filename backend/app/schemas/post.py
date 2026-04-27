@@ -44,6 +44,7 @@ class PostResponse(BaseModel):
     category: CategoryResponse
     created_at: datetime
     tags: list[TagResponse] = Field(default_factory=list)
+    visible_races: list[RaceResponse] = Field(default_factory=list)
     likes_count: int
     comments_count: int
     is_liked_by_current_user: bool
