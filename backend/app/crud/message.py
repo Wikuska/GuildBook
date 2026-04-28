@@ -22,7 +22,7 @@ def get_conversation_messages(
     if before_id:
         query = query.filter(Message.id < before_id)
 
-    messages = query.order_by(Message.created_at.desc()).limit(limit).all()
+    messages = query.order_by(Message.created_at.asc()).limit(limit).all()
     return list(reversed(messages))
 
 

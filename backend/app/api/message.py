@@ -10,7 +10,7 @@ from app.schemas.message import SendMessageRequest, MessageResponse, Conversatio
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
 
-@router.get("/conversations", response_model=list[ConversationResponse])
+@router.get("", response_model=list[ConversationResponse])
 def get_conversations(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth.get_current_user),
@@ -18,7 +18,7 @@ def get_conversations(
     return message_service.get_user_conversations(db, current_user)
 
 
-@router.get("/conversations/unread-count", response_model=UnreadCountResponse)
+@router.get("/unread-count", response_model=UnreadCountResponse)
 def get_unread_count(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth.get_current_user),
@@ -27,7 +27,7 @@ def get_unread_count(
     return UnreadCountResponse(unread_count=count)
 
 
-@router.post("/conversations/{other_user_id}/open", response_model=ConversationResponse)
+@router.post("/{other_user_id}/open", response_model=ConversationResponse)
 def open_conversation(
     other_user_id: int,
     db: Session = Depends(get_db),
@@ -36,7 +36,7 @@ def open_conversation(
     return message_service.open_conversation(db, other_user_id, current_user)
 
 
-@router.get("/conversations/{conversation_id}/messages", response_model=list[MessageResponse])
+@router.get("/{conversation_id}/messages", response_model=list[MessageResponse])
 def get_conversation_messages(
     conversation_id: int,
     limit: int = Query(20, ge=1, le=100),
@@ -47,7 +47,7 @@ def get_conversation_messages(
     return message_service.get_conversation_messages(db, conversation_id, limit, current_user, before_id)
 
 
-@router.post("/conversations/{conversation_id}/messages", response_model=MessageResponse, status_code=201)
+@router.post("/{conversation_id}/messages", response_model=MessageResponse, status_code=201)
 def send_message(
     conversation_id: int,
     data: SendMessageRequest,
@@ -57,7 +57,7 @@ def send_message(
     return message_service.send_message_to_conversation(db, conversation_id, data, current_user)
 
 
-@router.patch("/conversations/{conversation_id}/read", status_code=204)
+@router.patch("/{conversation_id}/read", status_code=204)
 def mark_conversation_read(
     conversation_id: int,
     db: Session = Depends(get_db),
