@@ -3,6 +3,7 @@ import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
 import { CreatePostModal } from "../modals/CreatePostModal";
 import { PostViewModal } from "../modals/PostViewModal";
+import { ChatWindowContainer } from "../chat/ChatWindowContainer";
 
 export function AppLayout() {
   return (
@@ -13,6 +14,7 @@ export function AppLayout() {
         <main className="flex-1 overflow-y-auto p-5">
           <Outlet />
         </main>
+        <ChatWindowContainer />
         <CreatePostModal />
         <PostViewModal />
       </div>

@@ -2,6 +2,7 @@ import { Avatar } from "../ui/Avatar";
 import type { PublicUserResponse } from "../../api/users";
 import { formatMembershipDate } from "../../utils";
 import { useToggleFollow } from "../../hooks/user/useToggleFollow";
+import { useCreateConversation } from "../../hooks/conversations";
 
 interface ProfileHeaderProps {
   profile: PublicUserResponse;
@@ -13,6 +14,8 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
     profile.id,
     profile.is_followed_by_current_user,
   );
+
+  const createConversation = useCreateConversation();
 
   return (
     <div className="relative shrink-0 border-b border-border-base px-8 pb-6">
@@ -35,7 +38,13 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
             </button>
           ) : (
             <div>
-              <button className="rounded-sm border border-border-accent bg-bg-surface px-3.5 py-1.5 text-[11px] uppercase tracking-[1.5px] text-text-mid transition-colors hover:border-text-dim hover:text-text-dim">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  createConversation.mutate(Number(profile.id));
+                }}
+                className="rounded-sm border border-border-accent bg-bg-surface px-3.5 py-1.5 text-[11px] uppercase tracking-[1.5px] text-text-mid transition-colors hover:border-text-dim hover:text-text-dim"
+              >
                 Message
               </button>
               <button
