@@ -66,6 +66,14 @@ class CommentDeleteForbiddenError(AppException):
 class CannotMessageYourselfError(AppException):
     status_code = 400
     detail = "You cannot send a message to yourself"
+    
+class ConversationNotFoundError(AppException):
+    status_code = 404
+    detail = "Conversation not found"
+
+class UnauthorizedConversationError(AppException):
+    status_code = 403
+    detail = "You are not a participant of this conversation"
 
 class SelfFollowNotAllowedError(AppException):
     status_code = 403

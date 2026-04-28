@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
@@ -12,7 +12,7 @@ from app.models import (
     Race, Tag, Category,
     User, UserFollow,
     Post, PostTag, PostVisibleRace, PostLike,
-    Comment, Message,
+    Comment, Message, Conversation,
     Notification, NotificationType,
 )
 from app.core.config import settings
@@ -29,6 +29,21 @@ def hash_password(plain: str) -> str:
 
 
 def seed(db: Session) -> None:
+    
+    db.execute(text("TRUNCATE TABLE messages RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE conversations RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE notifications RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE posts RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE users RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE races RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE tags RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE categories RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE comments RESTART IDENTITY CASCADE"))
+    db.execute(text("TRUNCATE TABLE post_likes CASCADE"))
+    db.execute(text("TRUNCATE TABLE post_tags CASCADE"))
+    db.execute(text("TRUNCATE TABLE post_visible_races CASCADE"))
+    db.execute(text("TRUNCATE TABLE user_follows CASCADE"))
+    db.flush()
 
     # -------------------------
     # RACES
@@ -49,7 +64,7 @@ def seed(db: Session) -> None:
     # -------------------------
     # CATEGORIES
     # -------------------------
-    category_names = ["discussion", "market", "help_request", "announcement", "event", "contracts"]
+    category_names = ["discussion", "market", "help_request", "announcement", "event", "contract"]
     categories = {name: Category(name=name) for name in category_names}
     db.add_all(categories.values())
     db.flush()
@@ -139,7 +154,7 @@ def seed(db: Session) -> None:
             "title": "Griffin contract near Novigrad — high reward",
             "content": "A royal griffin has been spotted terrorizing the villages east of Novigrad. The alderman offers 500 crowns for the head. Bring your best silver sword.",
             "author": "Geralt",
-            "category": "contracts",
+            "category": "contract",
             "tags": ["monsters"],
             "visible_races": [],
         },
@@ -323,23 +338,48 @@ def seed(db: Session) -> None:
     # -------------------------
     # MESSAGES
     # -------------------------
-    messages_data = [
-        ("Dandelion", "Geralt", "Geralt, I heard about the griffin contract. Mind if I tag along for the story?"),
-        ("Geralt", "Dandelion", "You'll slow me down. Stay in Oxenfurt."),
-        ("Dandelion", "Geralt", "I promise I won't get in the way. Much."),
-        ("Triss", "Yennefer", "Yen, the council meeting — are you attending in person or by projection?"),
-        ("Yennefer", "Triss", "In person. There are matters that require a physical presence."),
-        ("Zoltan", "Geralt", "Still need that silver blade sharpened? I have a new whetstone from Mahakam."),
-        ("Geralt", "Zoltan", "Bring it to the inn tonight. I'll pay in coin."),
-        ("Francesca", "Triss", "Triss, I need a discreet source of magical reagents. Can you help?"),
-        ("Triss", "Francesca", "Depends on what you need. Send me a list."),
+    conversations_data = [
+        ("Dandelion", "Geralt"),
+        ("Triss", "Yennefer"),
+        ("Zoltan", "Geralt"),
+        ("Francesca", "Triss"),
     ]
 
-    for sender_name, receiver_name, content in messages_data:
+    conversations = {}
+    for p1_name, p2_name in conversations_data:
+        conv = Conversation(
+            participant_one_id=users[p1_name].id,
+            participant_two_id=users[p2_name].id,
+        )
+        db.add(conv)
+        db.flush()
+        conversations[(p1_name, p2_name)] = conv
+        conversations[(p2_name, p1_name)] = conv
+
+    def get_conv(a, b):
+        return conversations[(a, b)]
+
+    messages_data = [
+        ("Dandelion", "Geralt", "Geralt, I heard about the griffin contract. Mind if I tag along for the story?", True),
+        ("Geralt", "Dandelion", "You'll slow me down. Stay in Oxenfurt.", True),
+        ("Dandelion", "Geralt", "I promise I won't get in the way. Much.", False),
+        ("Triss", "Yennefer", "Yen, the council meeting — are you attending in person or by projection?", True),
+        ("Yennefer", "Triss", "In person. There are matters that require a physical presence.", True),
+        ("Triss", "Yennefer", "I'll see you there then.", False),
+        ("Zoltan", "Geralt", "Still need that silver blade sharpened? I have a new whetstone from Mahakam.", True),
+        ("Geralt", "Zoltan", "Bring it to the inn tonight. I'll pay in coin.", False),
+        ("Francesca", "Triss", "Triss, I need a discreet source of magical reagents. Can you help?", True),
+        ("Triss", "Francesca", "Depends on what you need. Send me a list.", False),
+    ]
+
+    for sender_name, receiver_name, content, is_read in messages_data:
+        conv = get_conv(sender_name, receiver_name)
         db.add(Message(
+            conversation_id=conv.id,
             sender_id=users[sender_name].id,
             receiver_id=users[receiver_name].id,
             content=content,
+            is_read=is_read,
         ))
 
     db.flush()
