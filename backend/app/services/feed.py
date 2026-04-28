@@ -8,10 +8,10 @@ from app.models.user import User
 from app.services.post import build_post_responses, _normalize_ids
 from app.core.exceptions import InvalidCategoryFilterError, InvalidTagFilterError
 
-FEED_CATEGORY_IDS = [25, 28, 29]  
-MARKET_CATEGORY_IDS = [26]            
-HELP_CATEGORY_IDS = [27]           
-CONTRACT_CATEGORY_IDS = [30]         
+FEED_CATEGORY_NAMES = ["discussion", "announcement", "event"]  
+MARKET_CATEGORY_NAMES = ["market"]            
+HELP_CATEGORY_NAMES = ["help_request"]           
+CONTRACT_CATEGORY_NAMES = ["contract"]         
 
 
 def _build_feed(
@@ -19,10 +19,11 @@ def _build_feed(
     current_user: User,
     skip: int,
     limit: int,
-    category_ids: list[int],
+    category_names: list[str],
     tag_ids: list[int] | None
 ) -> list[PostResponse]:
     
+    category_ids = category_crud.get_category_ids_by_names(db, category_names)
     normalized_category_ids = _normalize_ids(category_ids) if category_ids else None
     normalized_tag_ids = _normalize_ids(tag_ids) if tag_ids else None
     
@@ -60,13 +61,13 @@ def _build_feed(
 
 
 def get_feed(db, skip, limit, current_user, tag_ids):
-    return _build_feed(db, current_user, skip, limit, FEED_CATEGORY_IDS, tag_ids)
+    return _build_feed(db, current_user, skip, limit, FEED_CATEGORY_NAMES, tag_ids)
 
 def get_market(db, skip, limit, current_user, tag_ids):
-    return _build_feed(db, current_user, skip, limit, MARKET_CATEGORY_IDS, tag_ids)
+    return _build_feed(db, current_user, skip, limit, MARKET_CATEGORY_NAMES, tag_ids)
 
 def get_help_requests(db, skip, limit, current_user, tag_ids):
-    return _build_feed(db, current_user, skip, limit, HELP_CATEGORY_IDS, tag_ids)
+    return _build_feed(db, current_user, skip, limit, HELP_CATEGORY_NAMES, tag_ids)
 
 def get_contracts(db, skip, limit, current_user, tag_ids):
-    return _build_feed(db, current_user, skip, limit, CONTRACT_CATEGORY_IDS, tag_ids)
+    return _build_feed(db, current_user, skip, limit, CONTRACT_CATEGORY_NAMES, tag_ids)

@@ -13,3 +13,7 @@ def count_categories_by_ids(db: Session, category_ids: list[int]) -> int:
     if not category_ids:
         return 0
     return db.query(Category.id).filter(Category.id.in_(category_ids)).count()
+
+def get_category_ids_by_names(db: Session, names: list[str]) -> list[int]:
+    categories = db.query(Category).filter(Category.name.in_(names)).all()
+    return [c.id for c in categories]
