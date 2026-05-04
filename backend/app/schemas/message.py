@@ -26,6 +26,7 @@ class MessagePreviewResponse(BaseModel):
 
 class MessageResponse(BaseModel):
     id: int
+    conversation_id: int
     content: str
     sender_id: int
     receiver_id: int
