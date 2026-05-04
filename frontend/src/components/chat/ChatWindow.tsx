@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { X, Minus } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
 import { useMessages } from "../../hooks/conversations/useMessages";
-import { useSendMessage } from "../../hooks/conversations/useSendMessage";
 import { useMarkConversationRead } from "../../hooks/conversations/useMarkConversationRead";
 import { useCurrentUser } from "../../hooks/user/useCurrentUser";
 import { useConversations } from "../../hooks/conversations/useConversations";
@@ -18,8 +17,7 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
   const { closeConversation } = useChatStore();
   const { data: currentUser } = useCurrentUser();
   const { data: conversations = [] } = useConversations(true);
-  const { data: messages = [], isLoading } = useMessages(conversationId);
-  const { mutate: sendMessage, isPending } = useSendMessage(conversationId);
+  const { messages, connected, sendMessage } = useMessages(conversationId);
   const { mutate: markRead } = useMarkConversationRead();
   const [text, setText] = useState("");
   const [minimized, setMinimized] = useState(false);
@@ -40,8 +38,9 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
 
   const handleSend = () => {
     const trimmed = text.trim();
-    if (!trimmed || isPending) return;
-    sendMessage(trimmed, { onSuccess: () => setText("") });
+    if (!trimmed || !connected) return;
+    sendMessage(trimmed);
+    setText("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -49,6 +48,10 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleFocus = () => {
+    markRead(conversationId);
   };
 
   const rightOffset = 16 + index * 296;
@@ -60,6 +63,8 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
         width: "280px",
         right: `${rightOffset}px`,
       }}
+      onFocus={handleFocus}
+      tabIndex={-1}
     >
       <div className="pointer-events-none absolute -left-px -top-px h-2 w-2 border-l border-t border-gold z-10" />
       <div className="pointer-events-none absolute -right-px -top-px h-2 w-2 border-r border-t border-gold z-10" />
@@ -107,7 +112,7 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
             className="flex flex-col gap-2 overflow-y-auto p-3"
             style={{ height: "260px" }}
           >
-            {isLoading ? (
+            {!connected && messages.length === 0 ? (
               <p className="text-center text-[11px] uppercase tracking-[1.5px] text-text-dim mt-4">
                 Loading...
               </p>
@@ -139,7 +144,7 @@ export function ChatWindow({ conversationId, index }: ChatWindowProps) {
               />
               <button
                 onClick={handleSend}
-                disabled={!text.trim() || isPending}
+                disabled={!text.trim() || !connected}
                 className="mb-1.5 mr-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-text-dim transition-colors hover:text-gold disabled:opacity-30"
               >
                 <svg width="12" height="12" viewBox="0 0 13 13" fill="none">

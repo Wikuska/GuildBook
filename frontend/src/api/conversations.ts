@@ -11,6 +11,7 @@ export interface MessagePreviewResponse {
 
 export interface MessageResponse {
   id: number;
+  conversation_id: number;
   content: string;
   sender_id: number;
   receiver_id: number;

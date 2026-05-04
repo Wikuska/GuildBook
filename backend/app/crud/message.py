@@ -22,9 +22,11 @@ def get_conversation_messages(
     if before_id:
         query = query.filter(Message.id < before_id)
 
-    messages = query.order_by(Message.created_at.asc()).limit(limit).all()
+    messages = query.order_by(Message.id.desc()).limit(limit).all()
     return list(reversed(messages))
 
+def get_conversation_by_id(db: Session, conversation_id: int) -> Conversation | None:
+    return db.get(Conversation, conversation_id)
 
 def get_or_create_conversation(
     db: Session,
