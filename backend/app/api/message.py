@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 import asyncio
+from app.services.sse_service import broadcast_to_user
 from sqlalchemy.orm import Session
 from app.db.database import get_db, SessionLocal
 from app.services import auth
@@ -80,6 +81,19 @@ async def conversation_ws(
                     "is_read": msg.is_read,
                     "created_at": msg.created_at.isoformat(),
                 }
+                
+                if msg.receiver_id != current_user.id:
+                    asyncio.create_task(
+                broadcast_to_user(
+                    user_id=msg.receiver_id,
+                    event_type="new_message",
+                    payload={
+                        "conversation_id": conversation_id,
+                        "sender_name": current_user.username,
+                        "snippet": msg.content[:30] + ("..." if len(msg.content) > 30 else "")
+                    }
+                )
+            )
             
             await manager.broadcast(conversation_id, broadcast_data)
             

@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
-
+from fastapi import BackgroundTasks
 from app.models import User, NotificationType
 from app.schemas.user import FollowStatusResponse
 from app.crud import user as user_crud
 from app.crud import follow as follow_crud
 from app.crud import notification as notification_crud
+from app.services.sse_service import broadcast_to_user
 from app.core.exceptions import UserNotFoundError, SelfFollowNotAllowedError
 
 
@@ -18,7 +19,7 @@ def _ensure_not_self_follow(current_user_id: int, target_user_id: int) -> None:
     if current_user_id == target_user_id:
         raise SelfFollowNotAllowedError()
     
-def follow_user(db: Session, target_user_id: int, current_user: User) -> FollowStatusResponse:
+def follow_user(db: Session, target_user_id: int, current_user: User, background_tasks: BackgroundTasks) -> FollowStatusResponse:
     _ensure_not_self_follow(current_user.id, target_user_id)
     _ensure_target_user_exists(db, target_user_id)
     
@@ -40,6 +41,18 @@ def follow_user(db: Session, target_user_id: int, current_user: User) -> FollowS
             recipient_id = target_user_id,
             actor_id = current_user.id,
             notification_type = NotificationType.follow
+        )
+        
+        if target_user_id != current_user.id:
+            background_tasks.add_task(
+            broadcast_to_user,
+            user_id=target_user_id,
+            event_type="notification",
+            payload={
+                "action": "user_follow",
+                "actor_id": current_user.id,
+                "actor_name": current_user.username
+            }
         )
         
     db.commit()

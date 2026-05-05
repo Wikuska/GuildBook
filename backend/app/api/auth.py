@@ -25,7 +25,7 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, data.email, data.password)
 
-    token = create_access_token({"sub": str(user.id)})
+    token = create_access_token({"sub": str(user.id), "race_id": user.race_id})
     return TokenResponse(access_token=token)
 
 @router.get("/me", response_model=UserMeResponse)
