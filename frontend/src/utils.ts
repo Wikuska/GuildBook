@@ -21,3 +21,18 @@ export function formatMembershipDate(dateStr: string): string {
     year: "numeric",
   }).format(date);
 }
+
+export type FeedSection = "feed" | "market" | "help" | "contracts";
+export type MaybeFeedSection = FeedSection | null;
+
+export const CATEGORY_TO_SECTION: Record<string, FeedSection> = {
+  discussion: "feed",
+  announcement: "feed",
+  event: "feed",
+  market: "market",
+  help_request: "help",
+  contract: "contracts",
+};
+
+export const getSectionFromCategory = (category: string): MaybeFeedSection =>
+  CATEGORY_TO_SECTION[category] ?? null;

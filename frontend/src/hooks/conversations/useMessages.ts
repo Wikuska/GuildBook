@@ -4,7 +4,7 @@ import type { MessageResponse } from "../../api/conversations";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/authStore";
 
-export function useMessages(conversationId: number | null) {
+export function useMessages(conversationId: number | null | undefined) {
   const token = useAuthStore((s) => s.token);
 
   const [messages, setMessages] = useState<MessageResponse[]>([]);
@@ -13,7 +13,7 @@ export function useMessages(conversationId: number | null) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (conversationId === null || !token) return;
+    if (!conversationId || !token) return;
 
     let isSubscribed = true;
     let ws: WebSocket | null = null;
