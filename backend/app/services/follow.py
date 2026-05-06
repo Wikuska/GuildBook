@@ -43,17 +43,16 @@ def follow_user(db: Session, target_user_id: int, current_user: User, background
             notification_type = NotificationType.follow
         )
         
-        if target_user_id != current_user.id:
-            background_tasks.add_task(
-            broadcast_to_user,
-            user_id=target_user_id,
-            event_type="notification",
-            payload={
-                "action": "user_follow",
-                "actor_id": current_user.id,
-                "actor_name": current_user.username
-            }
-        )
+        background_tasks.add_task(
+        broadcast_to_user,
+        user_id=target_user_id,
+        event_type="notification",
+        payload={
+            "action": "user_follow",
+            "actor_id": current_user.id,
+            "actor_name": current_user.username
+        })
+
         
     db.commit()
     

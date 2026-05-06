@@ -48,13 +48,13 @@ async def conversation_ws(
             await websocket.close(code=4001)
             return
 
-    conversation = message_crud.get_conversation_by_id(db, conversation_id)
-    if conversation is None or current_user.id not in (
-        conversation.participant_one_id,
-        conversation.participant_two_id,
-    ):
-        await websocket.close(code=4003)
-        return
+        conversation = message_crud.get_conversation_by_id(db, conversation_id)
+        if conversation is None or current_user.id not in (
+            conversation.participant_one_id,
+            conversation.participant_two_id,
+        ):
+            await websocket.close(code=4003)
+            return
 
     await manager.connect(conversation_id, websocket)
     try:
@@ -65,13 +65,18 @@ async def conversation_ws(
                 continue
 
             with SessionLocal() as db:
+                current_user = user_crud.get_user_by_id(db, int(user_id))
+                if current_user is None:
+                    await websocket.close(code=4001)
+                    break
+
                 msg = message_service.send_message_to_conversation(
                     db,
                     conversation_id,
                     SendMessageRequest(content=content),
                     current_user,
                 )
-                
+
                 broadcast_data = {
                     "id": msg.id,
                     "conversation_id": conversation_id,
@@ -81,22 +86,21 @@ async def conversation_ws(
                     "is_read": msg.is_read,
                     "created_at": msg.created_at.isoformat(),
                 }
-                
+
                 if msg.receiver_id != current_user.id:
                     asyncio.create_task(
-                broadcast_to_user(
-                    user_id=msg.receiver_id,
-                    event_type="new_message",
-                    payload={
-                        "conversation_id": conversation_id,
-                        "sender_name": current_user.username,
-                        "snippet": msg.content[:30] + ("..." if len(msg.content) > 30 else "")
-                    }
-                )
-            )
-            
+                        broadcast_to_user(
+                            user_id=msg.receiver_id,
+                            event_type="new_message",
+                            payload={
+                                "conversation_id": conversation_id,
+                                "sender_name": current_user.username,
+                                "snippet": msg.content[:30] + ("..." if len(msg.content) > 30 else "")
+                            }
+                        )
+                    )
             await manager.broadcast(conversation_id, broadcast_data)
-            
+
     except WebSocketDisconnect:
         manager.disconnect(conversation_id, websocket)
 

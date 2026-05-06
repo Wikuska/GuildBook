@@ -9,6 +9,7 @@ from app.core.security import decode_access_token
 from app.core.config import settings
 from fastapi.responses import StreamingResponse
 import redis.asyncio as redis
+import json
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
@@ -84,9 +85,17 @@ async def notification_stream(
                 if message:
                     data = message["data"].decode("utf-8")
                     
+                    try:
+                        parsed = json.loads(data)
+                        if (
+                            parsed.get("type") == "new_post"
+                            and parsed.get("data", {}).get("author_id") == int(user_id)
+                        ):
+                            continue
+                    except (json.JSONDecodeError, ValueError):
+                        pass
+    
                     yield f"data: {data}\n\n"
-                else:
-                    yield ": keepalive\n\n"
 
         finally:
             if pubsub is not None:

@@ -6,9 +6,10 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 async def broadcast_to_user(user_id: int, event_type: str, payload: dict):
-    redis_conn = redis.from_url(settings.REDIS_URL)
+    redis_conn = None
     
     try:
+        redis_conn = redis.from_url(settings.REDIS_URL)
         message = {
             "type": event_type,
             "data": payload
@@ -20,7 +21,8 @@ async def broadcast_to_user(user_id: int, event_type: str, payload: dict):
         logger.error(f"Nie udało się wysłać powiadomienia SSE do usera {user_id}: {e}")
         
     finally:
-        await redis_conn.aclose()
+        if redis_conn is not None:
+            await redis_conn.aclose()
         
 async def broadcast_to_race(race_id: int, event_type: str, payload: dict):
     redis_conn = None
