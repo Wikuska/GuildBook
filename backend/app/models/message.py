@@ -14,6 +14,7 @@ class Conversation(Base):
 	participant_one_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 	participant_two_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+	last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 	participant_one: Mapped["User"] = relationship("User", foreign_keys=[participant_one_id])
 	participant_two: Mapped["User"] = relationship("User", foreign_keys=[participant_two_id])
@@ -34,4 +35,3 @@ class Message(Base):
 	sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id])
 	receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id])
 	conversation: Mapped["Conversation"] = relationship("Conversation", back_populates="messages")
-	created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

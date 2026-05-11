@@ -1,4 +1,5 @@
-from sqlalchemy import or_, and_
+from datetime import datetime, timezone
+from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import Session
 from app.models import Message, Conversation, User
 from sqlalchemy.orm import joinedload
@@ -6,8 +7,12 @@ from sqlalchemy.orm import joinedload
 
 def create_message(db: Session, message: Message) -> Message:
     db.add(message)
+    conversation = db.get(Conversation, message.conversation_id)
+    if conversation:
+        conversation.last_message_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(message)
+    
     return message
 
 
@@ -72,14 +77,20 @@ def get_user_conversations(
             or_(
                 Conversation.participant_one_id == user_id,
                 Conversation.participant_two_id == user_id,
-            )
+            ),
+            Conversation.last_message_at.isnot(None)
         )
         .options(
             joinedload(Conversation.participant_one).joinedload(User.race),
             joinedload(Conversation.participant_two).joinedload(User.race),
             joinedload(Conversation.messages),
         )
-        .order_by(Conversation.created_at.desc())
+        .order_by(
+            func.coalesce(
+                Conversation.last_message_at,
+                Conversation.created_at
+            ).desc()
+        )
         .all()
     )
 

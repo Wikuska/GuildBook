@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import sys
 import os
 
@@ -372,17 +373,21 @@ def seed(db: Session) -> None:
         ("Triss", "Francesca", "Depends on what you need. Send me a list.", False),
     ]
 
-    for sender_name, receiver_name, content, is_read in messages_data:
+    now = datetime.now(timezone.utc)
+    for i, (sender_name, receiver_name, content, is_read) in enumerate(messages_data):
         conv = get_conv(sender_name, receiver_name)
+        msg_time = now - timedelta(minutes=len(messages_data) - i)
         db.add(Message(
             conversation_id=conv.id,
             sender_id=users[sender_name].id,
             receiver_id=users[receiver_name].id,
             content=content,
             is_read=is_read,
+            created_at=msg_time,
         ))
+        conv.last_message_at = msg_time
 
-    db.flush()
+        db.flush()
 
     # -------------------------
     # NOTIFICATIONS

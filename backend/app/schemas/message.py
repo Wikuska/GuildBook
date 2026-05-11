@@ -40,6 +40,7 @@ class ConversationResponse(BaseModel):
     id: int
     other_participant: AuthorResponse
     last_message: MessagePreviewResponse | None
+    last_message_at: datetime | None
     unread_count: int
     created_at: datetime
 

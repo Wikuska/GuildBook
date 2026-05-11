@@ -105,6 +105,7 @@ def build_conversation_response(
         id=conversation.id,
         other_participant=AuthorResponse.model_validate(other),
         last_message=MessagePreviewResponse.model_validate(last_message) if last_message else None,
+        last_message_at=conversation.last_message_at,
         unread_count=unread_count,
         created_at=conversation.created_at,
     )
