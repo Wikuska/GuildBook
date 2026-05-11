@@ -25,35 +25,43 @@ def follow_user(db: Session, target_user_id: int, current_user: User, background
     
     existing_follow = follow_crud.get_follow(
         db,
-        follower_id = current_user.id,
-        followed_id = target_user_id
+        follower_id=current_user.id,
+        followed_id=target_user_id
     )
     
     if existing_follow is None:
         follow_crud.create_follow(
             db,
-            follower_id = current_user.id,
-            followed_id = target_user_id
+            follower_id=current_user.id,
+            followed_id=target_user_id
         )
-        
-        notification_crud.create_notification(
-            db,
-            recipient_id = target_user_id,
-            actor_id = current_user.id,
-            notification_type = NotificationType.follow
-        )
-        
-        background_tasks.add_task(
-        broadcast_to_user,
-        user_id=target_user_id,
-        event_type="notification",
-        payload={
-            "action": "user_follow",
-            "actor_id": current_user.id,
-            "actor_name": current_user.username
-        })
 
-        
+        existing_notification = notification_crud.get_existing_notification(
+            db,
+            recipient_id=target_user_id,
+            actor_id=current_user.id,
+            notification_type=NotificationType.follow,
+            within_hours=1
+        )
+
+        if not existing_notification:
+            notification_crud.create_notification(
+                db,
+                recipient_id=target_user_id,
+                actor_id=current_user.id,
+                notification_type=NotificationType.follow,
+            )
+            background_tasks.add_task(
+                broadcast_to_user,
+                user_id=target_user_id,
+                event_type="notification",
+                payload={
+                    "action": "user_follow",
+                    "actor_id": current_user.id,
+                    "actor_name": current_user.username
+                }
+            )
+
     db.commit()
     
     return FollowStatusResponse(

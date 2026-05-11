@@ -31,25 +31,33 @@ def like_post(db: Session, post_id: int, current_user: User, background_tasks: B
     if existing_like is None:
         post_like_crud.create_like(db, post_id=post_id, user_id=current_user.id)
 
-        notification_crud.create_notification(
-        db,
-        recipient_id=post.author_id,
-        actor_id=current_user.id,
-        notification_type=NotificationType.post_like,
-        post_id=post_id,
-        )
-        
         if post.author_id != current_user.id:
-            background_tasks.add_task(
-                broadcast_to_user,
-                user_id=post.author_id,
-                event_type="notification",
-                payload={
-                    "action": "post_like",
-                    "post_id": post_id,
-                    "actor_name": current_user.username
-                }
+            existing_notification = notification_crud.get_existing_notification(
+                db,
+                recipient_id=post.author_id,
+                actor_id=current_user.id,
+                notification_type=NotificationType.post_like,
+                post_id=post_id,
             )
+
+            if not existing_notification:
+                notification_crud.create_notification(
+                    db,
+                    recipient_id=post.author_id,
+                    actor_id=current_user.id,
+                    notification_type=NotificationType.post_like,
+                    post_id=post_id,
+                )
+                background_tasks.add_task(
+                    broadcast_to_user,
+                    user_id=post.author_id,
+                    event_type="notification",
+                    payload={
+                        "action": "post_like",
+                        "post_id": post_id,
+                        "actor_name": current_user.username
+                    }
+                )
 
     db.commit()
     
