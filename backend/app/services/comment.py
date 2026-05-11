@@ -1,13 +1,15 @@
 from sqlalchemy.orm import Session
+from fastapi import BackgroundTasks
 from app.models import User, Comment, NotificationType
 from app.schemas.comment import CreateCommentRequest, UpdateCommentRequest
 from app.crud import comment as comment_crud
 from app.crud import post as post_crud
 from app.crud import notification as notification_crud
+from app.services.sse_service import broadcast_to_user
 from app.core.exceptions import PostNotFoundError, CommentDeleteForbiddenError, CommentEditForbiddenError, CommentNotFoundError
 
 
-def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, current_user: User) -> Comment:
+def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, current_user: User, background_tasks: BackgroundTasks) -> Comment:
     post = post_crud.get_post_by_id(db, post_id, current_user.race_id, current_user.id, current_user.is_admin)
     if not post:
         raise PostNotFoundError()
@@ -27,6 +29,19 @@ def create_new_comment(db: Session, post_id: int, data: CreateCommentRequest, cu
     notification_type=NotificationType.post_comment,
     post_id=post_id,
     )
+    
+    if post.author_id != current_user.id:
+        background_tasks.add_task(
+            broadcast_to_user,
+            user_id=post.author_id,
+            event_type="notification",
+            payload={
+                "action": "post_comment",
+                "post_id": post_id,
+                "comment_id": comment.id,
+                "actor_name": current_user.username
+            }
+        )
     
     db.commit()
     return comment

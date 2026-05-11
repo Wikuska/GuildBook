@@ -1,7 +1,12 @@
 import { Avatar } from "../ui/Avatar";
+import { useEffect } from "react";
 import { useFilterStore } from "../../store/FilterStore";
 import { useTags } from "../../hooks/lookup";
 import { useCurrentUser } from "../../hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFeedStore } from "../../store/feedStore";
+import { ArrowUp } from "lucide-react";
+import { useCurrentSection } from "../../hooks/ui/useCurrentSection";
 
 function TagButton({
   label,
@@ -42,6 +47,29 @@ export function Sidebar() {
   const { selectedTag, setSelectedTag } = useFilterStore();
   const { data: tags, isLoading, isError } = useTags();
   const { data: user } = useCurrentUser();
+
+  const currentSection = useCurrentSection();
+  const queryClient = useQueryClient();
+  const setNewPostsFlag = useFeedStore((state) => state.setNewPostsFlag);
+
+  useEffect(() => {
+    if (currentSection) {
+      setNewPostsFlag(currentSection, false);
+    }
+  }, [currentSection, setNewPostsFlag]);
+
+  const showRefreshButton = useFeedStore((state) =>
+    currentSection ? state.newPostsFlags[currentSection] : false,
+  );
+
+  const handleRefresh = () => {
+    if (!currentSection) return;
+    setNewPostsFlag(currentSection, false);
+    queryClient.invalidateQueries({ queryKey: ["posts", currentSection] });
+    document
+      .getElementById("main-scroll-container")
+      ?.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <aside className="relative flex w-55 min-w-55 shrink-0 flex-col gap-6 border-r border-border-base bg-bg-mid px-4 py-5 after:absolute after:-right-0.75 after:bottom-0 after:top-0 after:w-0.5">
@@ -125,6 +153,16 @@ export function Sidebar() {
             ))}
         </div>
       </div>
+      {showRefreshButton && (
+        <div className="mt-auto pt-4 flex justify-center sticky bottom-4">
+          <button
+            onClick={handleRefresh}
+            className="flex w-full items-center justify-center gap-2 rounded border border-gold/50 bg-bg-surface px-4 py-2 text-sm font-semibold text-gold shadow-lg hover:border-gold hover:bg-gold/10 transition-all animate-pulse"
+          >
+            New scrolls <ArrowUp className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

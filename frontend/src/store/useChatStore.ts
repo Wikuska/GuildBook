@@ -12,6 +12,10 @@ export const useChatStore = create<ChatStore>((set) => ({
   openConversationIds: [],
   openConversation: (id) =>
     set((state) => {
+      if (!id) {
+        console.warn("Unknow conversation ID");
+        return state;
+      }
       if (state.openConversationIds.includes(id)) return state;
       const updated = [id, ...state.openConversationIds];
       return {

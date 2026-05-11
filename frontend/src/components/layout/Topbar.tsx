@@ -17,21 +17,29 @@ import { NotificationItem } from "./NotificationItem";
 import { formatTime } from "../../utils";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useFeedStore } from "../../store/feedStore";
+import type { MaybeFeedSection } from "../../utils";
 
 const NAV_ITEMS = ["feed", "market", "help", "contracts"];
 
 const NavItem = ({
   label,
   isActive = false,
+  hasNew = false,
 }: {
   label: string;
   isActive?: boolean;
+  hasNew?: boolean;
 }) => (
   <div
-    className={`px-4 h-13 flex items-center text-xs tracking-[1.5px] uppercase cursor-pointer transition-colors duration-150 border-b-2 -mb-px
+    className={`relative px-4 h-13 flex items-center text-xs tracking-[1.5px] uppercase cursor-pointer transition-colors duration-150 border-b-2 -mb-px
       ${isActive ? "text-parchment border-gold" : "text-sage border-transparent hover:text-gold"}`}
   >
     {label}
+
+    {hasNew && (
+      <span className="absolute top-3 right-1.5 h-1.5 w-1.5 rounded-full bg-gold animate-pulse shadow-[0_0_5px_rgba(212,175,55,0.8)]" />
+    )}
   </div>
 );
 
@@ -57,6 +65,8 @@ export function Topbar() {
   const { openConversation } = useChatStore();
 
   const logout = useAuthStore((s) => s.logout);
+
+  const newPostsFlags = useFeedStore((state) => state.newPostsFlags);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -93,17 +103,22 @@ export function Topbar() {
       </div>
 
       <nav className="flex flex-1">
-        {NAV_ITEMS.map((item) => (
-          <Link key={item} to={`/feed/${item === "feed" ? "" : item}`}>
-            <NavItem
-              label={item}
-              isActive={
-                pathname === `/feed/${item === "feed" ? "" : item}` ||
-                (item === "feed" && pathname === "/feed")
-              }
-            />
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item) => {
+          const isActive =
+            pathname === `/feed/${item === "feed" ? "" : item}` ||
+            (item === "feed" && pathname === "/feed");
+          const hasNew = newPostsFlags[item as NonNullable<MaybeFeedSection>];
+
+          return (
+            <Link key={item} to={`/feed/${item === "feed" ? "" : item}`}>
+              <NavItem
+                label={item}
+                isActive={isActive}
+                hasNew={hasNew && !isActive}
+              />
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="flex items-center gap-3 ml-auto">

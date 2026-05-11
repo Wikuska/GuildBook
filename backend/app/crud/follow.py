@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import UserFollow
+from app.models import User
 
 def get_follow(db: Session, follower_id: int, followed_id: int) -> UserFollow | None:
     return (
@@ -45,6 +46,14 @@ def get_followed_user_ids(db: Session, user_id: int) -> list[int]:
         .all()
     )
     return [row.followed_id for row in rows]
+
+def get_followers(db: Session, user_id: int) -> list[User]:
+    return (
+        db.query(User)
+        .join(UserFollow, UserFollow.follower_id == User.id)
+        .filter(UserFollow.followed_id == user_id)
+        .all()
+    )
     
 def is_following(db: Session, follower_id: int, followed_id: int) -> bool:
     return (

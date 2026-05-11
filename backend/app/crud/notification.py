@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from app.models.notification import Notification, NotificationType
+from datetime import datetime, timedelta, timezone
 
 def create_notification(
     db: Session,
@@ -82,3 +83,24 @@ def mark_all_read(db: Session, recipient_id: int) -> None:
         .update({"is_read": True}, synchronize_session=False)
     )
     db.flush()
+    
+def get_existing_notification(
+    db: Session,
+    recipient_id: int,
+    actor_id: int,
+    notification_type: NotificationType,
+    post_id: int | None = None,
+    within_hours: int = 24,
+) -> Notification | None:
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=within_hours)
+    return (
+        db.query(Notification)
+        .filter(
+            Notification.recipient_id == recipient_id,
+            Notification.actor_id == actor_id,
+            Notification.type == notification_type,
+            Notification.post_id == post_id,
+            Notification.created_at >= cutoff,
+        )
+        .first()
+    )

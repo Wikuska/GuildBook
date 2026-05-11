@@ -80,13 +80,18 @@ export const CreatePostModal = () => {
   if (!isCreatePostOpen) return null;
 
   const onSubmit = (data: CreatePostFormValues) => {
+    const payload = { ...data };
+    if (payload.visible_race_ids && payload.visible_race_ids.includes(0)) {
+      payload.visible_race_ids = [];
+    }
+
     if (isEditing) {
       updatePostMutation.mutate({
         postId: editingPost.id,
-        data: data as UpdatePostFormValues,
+        data: payload as UpdatePostFormValues,
       });
     } else {
-      createPostMutation.mutate(data);
+      createPostMutation.mutate(payload);
     }
   };
 
