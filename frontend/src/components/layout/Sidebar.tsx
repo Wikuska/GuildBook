@@ -66,7 +66,9 @@ export function Sidebar() {
     if (!currentSection) return;
     setNewPostsFlag(currentSection, false);
     queryClient.invalidateQueries({ queryKey: ["posts", currentSection] });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document
+      .getElementById("main-scroll-container")
+      ?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

@@ -1,8 +1,13 @@
 import { Outlet } from "react-router-dom";
-import { useCallback } from "react";
-import type { SseNewPostEvent } from "../../hooks/events";
+import { useCallback, useRef } from "react";
+import type {
+  SseNewMessageEvent,
+  SseNewPostEvent,
+  SseNotificationEvent,
+} from "../../hooks/events";
 import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
+import { useNavigate } from "react-router-dom";
 import { CreatePostModal } from "../modals/CreatePostModal";
 import { PostViewModal } from "../modals/PostViewModal";
 import { ChatWindowContainer } from "../chat/ChatWindowContainer";
@@ -11,10 +16,15 @@ import { useLiveEvents } from "../../hooks/events";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFeedStore } from "../../store/feedStore";
 import { getSectionFromCategory } from "../../utils";
+import { toast } from "sonner";
+import { useChatStore } from "../../store/useChatStore";
+import { usePostViewStore } from "../../store/usePostViewStore";
 
 export function AppLayout() {
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();
+  const recentCommentToasts = useRef<Set<number>>(new Set());
+  const navigate = useNavigate();
 
   const { setNewPostsFlag } = useFeedStore();
 
@@ -26,13 +36,70 @@ export function AppLayout() {
     [setNewPostsFlag],
   );
 
-  const handleNewMessage = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["conversations"] });
-  }, [queryClient]);
+  const handleNewMessage = useCallback(
+    (event: SseNewMessageEvent) => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
 
-  const handleNotification = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["notifications"] });
-  }, [queryClient]);
+      const currentOpenChats = useChatStore.getState().openConversationIds;
+
+      if (!currentOpenChats.includes(event.conversation_id)) {
+        toast(`${event.sender_name}: ${event.snippet}`, {
+          action: {
+            label: "Reply",
+            onClick: () => {
+              useChatStore.getState().openConversation(event.conversation_id);
+            },
+          },
+        });
+      }
+    },
+    [queryClient],
+  );
+
+  const handleNotification = useCallback(
+    (event: SseNotificationEvent) => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+
+      if (event.action === "user_follow") {
+        const actorId = event.actor_id;
+        if (!actorId) return;
+
+        toast(`${event.actor_name} started following you`, {
+          action: {
+            label: "Profile",
+            onClick: () => {
+              navigate(`/profile/${actorId}`);
+            },
+          },
+        });
+      }
+
+      if (event.action === "post_comment") {
+        const postId = event.post_id;
+        if (!postId) return;
+
+        if (!recentCommentToasts.current.has(postId)) {
+          recentCommentToasts.current.add(postId);
+
+          toast(`${event.actor_name} commented on your post`, {
+            action: {
+              label: "View",
+              onClick: () => {
+                usePostViewStore.getState().openPost(postId, null);
+              },
+            },
+          });
+
+          setTimeout(() => {
+            if (recentCommentToasts.current) {
+              recentCommentToasts.current.delete(postId);
+            }
+          }, 10_000);
+        }
+      }
+    },
+    [queryClient],
+  );
 
   useLiveEvents({
     token,
@@ -46,7 +113,7 @@ export function AppLayout() {
       <Topbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-5">
+        <main id="main-scroll-container" className="flex-1 overflow-y-auto p-5">
           <Outlet />
         </main>
         <ChatWindowContainer />

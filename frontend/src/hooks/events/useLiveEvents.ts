@@ -6,7 +6,7 @@ export interface SseNewPostEvent {
 }
 
 export interface SseNotificationEvent {
-  category: string;
+  action: string;
   post_id?: number;
   actor_name: string;
   actor_id?: number;
