@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks
-from app.services.sse_service import broadcast_to_race
+from app.services.sse_service import broadcast_to_user
 from app.models import User, Post
 from app.schemas.post import CreatePostRequest, PostResponse, RaceResponse, TagResponse, CategoryResponse, AuthorResponse
 from app.crud import post as post_crud
@@ -8,7 +8,7 @@ from app.crud import category as category_crud
 from app.crud import tag as tag_crud
 from app.crud import post_like as post_like_crud
 from app.crud import comment as comment_crud
-from app.crud import race as race_crud
+from app.crud import follow as follow_crud
 from app.core.exceptions import CategoryNotFoundError, PostNotFoundError, TagNotFoundError, InvalidCategoryFilterError, InvalidTagFilterError, PostDeleteForbiddenError, PostEditForbiddenError
 
 # HELPER FUNCTIONS
@@ -103,27 +103,25 @@ def create_new_post(db: Session, data: CreatePostRequest, current_user: User, ba
     )
 
     created_post = post_crud.create_post(db, post, visible_race_ids, tag_ids)
-    
     category_name = created_post.category.name if created_post.category else "unknown"
 
-    if visible_race_ids:
-        for race_id in visible_race_ids:
-            background_tasks.add_task(
-                broadcast_to_race,
-                race_id=race_id,
-                event_type="new_post",
-                payload={"category": category_name, "author_id": current_user.id}
-            )
-    else:
-        all_races = race_crud.get_all_races(db)
-        for race in all_races:
-            background_tasks.add_task(
-                broadcast_to_race,
-                race_id=race.id,
-                event_type="new_post",
-                payload={"category": category_name, "author_id": current_user.id}
-            )
-    
+    followers = follow_crud.get_followers(db, user_id=current_user.id)
+
+    for follower in followers:
+        if visible_race_ids and follower.race_id not in visible_race_ids:
+            continue
+
+        background_tasks.add_task(
+            broadcast_to_user,
+            user_id=follower.id,
+            event_type="new_post",
+            payload={
+                "category": category_name,
+                "author_id": current_user.id,
+                "author_name": current_user.username,
+            }
+        )
+
     return build_post_response(db, created_post, current_user)
 
 def update_post(
