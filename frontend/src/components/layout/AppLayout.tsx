@@ -9,7 +9,6 @@ import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
 import { useNavigate } from "react-router-dom";
 import { CreatePostModal } from "../modals/CreatePostModal";
-import { PostViewModal } from "../modals/PostViewModal";
 import { ChatWindowContainer } from "../chat/ChatWindowContainer";
 import { useAuthStore } from "../../store/authStore";
 import { useLiveEvents } from "../../hooks/events";
@@ -118,7 +117,6 @@ export function AppLayout() {
         </main>
         <ChatWindowContainer />
         <CreatePostModal />
-        <PostViewModal />
       </div>
     </div>
   );

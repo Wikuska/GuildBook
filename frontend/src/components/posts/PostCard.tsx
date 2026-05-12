@@ -2,14 +2,13 @@ import { useToggleLike } from "../../hooks/likes";
 import { type PostResponse } from "../../api/posts";
 import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { QueryKey } from "@tanstack/query-core";
 import { useCurrentUser } from "../../hooks/user";
 import { Swords, Feather } from "lucide-react";
 import { useDeletePost } from "../../hooks/posts";
 import { useState } from "react";
 import { usePostFormStore } from "../../store/usePostFormStore";
-import { usePostViewStore } from "../../store/usePostViewStore";
 
 interface PostCardProps {
   post: PostResponse;
@@ -17,6 +16,9 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, queryKey }: PostCardProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { mutate: toggleLike } = useToggleLike(
@@ -27,10 +29,15 @@ export function PostCard({ post, queryKey }: PostCardProps) {
 
   const deletePostMutation = useDeletePost(queryKey);
   const openEditModal = usePostFormStore((state) => state.openEditPost);
-  const openViewModal = usePostViewStore((state) => state.openPost);
 
   const { data: user } = useCurrentUser();
   const isAuthor = user?.id === post.author.id;
+
+  const openViewModal = (postId: number, queryKey: QueryKey) => {
+    navigate(`/post/${postId}`, {
+      state: { background: location, feedQueryKey: queryKey },
+    });
+  };
 
   return (
     <article

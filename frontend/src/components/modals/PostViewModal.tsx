@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { X } from "lucide-react";
-import { usePostViewStore } from "../../store/usePostViewStore";
 import { usePost } from "../../hooks/posts";
 import { useComments, useSubmitComment } from "../../hooks/comments";
 import { useToggleLike } from "../../hooks/likes";
@@ -12,7 +11,15 @@ import { PostComment } from "../posts/PostComment";
 import { useCurrentUser } from "../../hooks/user";
 
 export function PostViewModal() {
-  const { openPostId, feedQueryKey, closePost } = usePostViewStore();
+  const { id } = useParams<{ id: string }>();
+  if (!id) return null;
+  const openPostId = Number(id);
+  if (isNaN(openPostId)) return null;
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const feedQueryKey = location.state?.feedQueryKey;
+
   const { data: user } = useCurrentUser();
   const [commentText, setCommentText] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +37,15 @@ export function PostViewModal() {
     feedQueryKey ?? ["post", openPostId],
   );
 
-  useModalOverlay(openPostId !== null, closePost);
+  const handleClose = () => {
+    if (!location.state?.background) {
+      navigate("/feed");
+    } else {
+      navigate(-1);
+    }
+  };
+
+  useModalOverlay(true, handleClose);
 
   useEffect(() => {
     if (openPostId === null) setCommentText("");
@@ -60,17 +75,14 @@ export function PostViewModal() {
     <>
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]" />
 
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={closePost}
-      >
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           className="relative flex w-full max-w-3xl overflow-hidden rounded bg-bg-mid"
           style={{ border: "1px solid #2a2520", height: "75vh" }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={closePost}
+            onClick={handleClose}
             className="absolute right-3 top-3 z-10 flex h-6 w-6 items-center justify-center rounded text-text-dim transition-colors hover:text-parchment"
           >
             <X className="h-4 w-4" />
@@ -91,7 +103,6 @@ export function PostViewModal() {
                   <div className="flex items-center gap-2">
                     <Link
                       to={`/profile/${post.author.id}`}
-                      onClick={closePost}
                       className="flex items-center gap-2"
                     >
                       <Avatar
