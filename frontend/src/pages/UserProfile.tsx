@@ -23,7 +23,7 @@ export default function UserProfile() {
 
   if (isError || !profile) {
     return (
-      <div className="text-red-900/50 text-center mt-10">Scroll not found.</div>
+      <div className="text-text-dim text-center mt-10">User not found</div>
     );
   }
 
