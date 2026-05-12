@@ -156,7 +156,9 @@ export const CreatePostModal = () => {
                   onChange={field.onChange}
                   options={categories.map((cat) => ({
                     id: cat.id,
-                    name: cat.name,
+                    name: cat.name
+                      .replace(/_/g, " ")
+                      .replace(/^\w/, (c) => c.toUpperCase()),
                   }))}
                   error={errors.category_id?.message}
                   isLoading={isCategoriesLoading}

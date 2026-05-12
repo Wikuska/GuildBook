@@ -10,11 +10,7 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
-  const { mutate: toggleFollow } = useToggleFollow(
-    profile.id,
-    profile.is_followed_by_current_user,
-  );
-
+  const follow = useToggleFollow();
   const createConversation = useCreateConversation();
 
   return (
@@ -50,7 +46,10 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleFollow();
+                  follow.mutate({
+                    userId: profile.id,
+                    isFollowing: profile.is_followed_by_current_user,
+                  });
                 }}
                 className={`relative rounded-sm border px-4 py-1.5 text-[11px] uppercase tracking-[1.5px] transition-colors ${
                   profile.is_followed_by_current_user

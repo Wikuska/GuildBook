@@ -19,6 +19,7 @@ import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useFeedStore } from "../../store/feedStore";
 import type { MaybeFeedSection } from "../../utils";
+import { SearchBar } from "./SearchBar";
 
 const NAV_ITEMS = ["feed", "market", "help", "contracts"];
 
@@ -120,6 +121,8 @@ export function Topbar() {
           );
         })}
       </nav>
+
+      <SearchBar />
 
       <div className="flex items-center gap-3 ml-auto">
         {/* Messages */}

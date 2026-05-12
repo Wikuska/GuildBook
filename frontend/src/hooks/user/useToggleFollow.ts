@@ -1,41 +1,53 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toggleFollowUser } from "../../api/users";
 
-export function useToggleFollow(userId: string, isFollowing: boolean) {
+interface ToggleFollowVariables {
+  userId: string | number;
+  isFollowing: boolean;
+}
+
+export function useToggleFollow() {
   const queryClient = useQueryClient();
 
-  const queryKey = ["users", "profile", String(userId)];
-
   return useMutation({
-    mutationFn: () => toggleFollowUser(userId, isFollowing),
+    mutationFn: ({ userId, isFollowing }: ToggleFollowVariables) =>
+      toggleFollowUser(String(userId), isFollowing),
 
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey });
-      const previousProfile = queryClient.getQueryData(queryKey);
-      queryClient.setQueryData(queryKey, (old: any) => {
+    onMutate: async ({ userId, isFollowing }) => {
+      const profileQueryKey = ["users", "profile", String(userId)];
+
+      await queryClient.cancelQueries({ queryKey: profileQueryKey });
+      const previousProfile = queryClient.getQueryData(profileQueryKey);
+
+      queryClient.setQueryData(profileQueryKey, (old: any) => {
         if (!old) return old;
 
         return {
           ...old,
-          is_followed_by_current_user: !old.is_followed_by_current_user,
-          followers_count: old.is_followed_by_current_user
-            ? old.followers_count - 1
+          is_followed_by_current_user: !isFollowing,
+          followers_count: isFollowing
+            ? Math.max(0, old.followers_count - 1)
             : old.followers_count + 1,
         };
       });
-
-      return { previousProfile };
+      return { previousProfile, profileQueryKey };
     },
 
     onError: (_err, _vars, context) => {
-      if (context?.previousProfile) {
-        queryClient.setQueryData(queryKey, context.previousProfile);
+      if (context?.previousProfile && context.profileQueryKey) {
+        queryClient.setQueryData(
+          context.profileQueryKey,
+          context.previousProfile,
+        );
       }
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+    onSettled: (_data, _error, _vars, context) => {
+      if (context?.profileQueryKey) {
+        queryClient.invalidateQueries({ queryKey: context.profileQueryKey });
+      }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user-search"] });
     },
   });
 }
