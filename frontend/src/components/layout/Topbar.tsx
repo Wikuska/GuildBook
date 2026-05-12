@@ -68,9 +68,8 @@ export function Topbar() {
         })}
       </nav>
 
-      <SearchBar />
-
       <div className="flex items-center gap-3 ml-auto">
+        <SearchBar />
         <MessagesDropdown
           isOpen={activeDropdown === "messages"}
           onToggle={() => toggleDropdown("messages")}
