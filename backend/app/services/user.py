@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import User
-from app.schemas.user import UpdateProfileRequest, PublicUserResponse, PrivateUserResponse
+from app.schemas.user import UpdateProfileRequest, PublicUserResponse, PrivateUserResponse, UserSearchResult
 from app.crud import user as user_crud
 from app.crud import follow as follow_crud
 from app.crud import post as post_crud
@@ -51,3 +51,15 @@ def update_profile(db: Session, data: UpdateProfileRequest, current_user: User) 
 
     updated_user = user_crud.update_user(db, current_user, **updates)
     return build_private_user_response(db, updated_user)
+
+def search_users(db: Session, query: str, current_user: User) -> list[UserSearchResult]:
+    db_results = user_crud.search_users(db, query, current_user.id)
+    results = []
+    for user, is_followed in db_results: 
+        results.append(UserSearchResult(
+            id=user.id,
+            username=user.username,
+            race=user.race,
+            is_followed=is_followed 
+        ))
+    return results

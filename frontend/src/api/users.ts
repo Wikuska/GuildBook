@@ -16,6 +16,13 @@ export interface PublicUserResponse {
   created_at: string;
 }
 
+export interface UserSearchResult {
+  id: number;
+  username: string;
+  race: { id: number; name: string };
+  is_followed: boolean;
+}
+
 interface FetchUserProfileParams {
   id: string;
 }
@@ -24,8 +31,12 @@ export const fetchUserProfile = ({ id }: FetchUserProfileParams) => {
   return apiFetch<PublicUserResponse>(`/users/${id}`);
 };
 
-export async function toggleFollowUser(userId: string, isFollowing: boolean) {
+export function toggleFollowUser(userId: string, isFollowing: boolean) {
   return apiFetch<void>(`/users/${userId}/follow`, {
     method: isFollowing ? "DELETE" : "POST",
   });
 }
+
+export const searchUsers = (query: string) => {
+  return apiFetch<UserSearchResult[]>(`/users/search?q=${query}`);
+};

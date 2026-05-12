@@ -46,7 +46,6 @@ class PublicUserResponse(BaseModel):
     is_followed_by_current_user: bool = False
     created_at: datetime
     
-    
 class PrivateUserResponse(PublicUserResponse):
     email: str
     is_admin: bool
@@ -55,3 +54,9 @@ class FollowStatusResponse(BaseModel):
     target_user_id: int
     followers_count: int
     is_followed_by_current_user: bool
+    
+class UserSearchResult(BaseModel):
+    id: int
+    username: str
+    race: RaceResponse
+    is_followed: bool

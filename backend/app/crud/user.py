@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models import User, Post, Comment
+from app.models import User, UserFollow
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email, User.is_deleted == False).first()
@@ -28,3 +28,17 @@ def update_user(db: Session, user: User, **kwargs) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+def search_users(db: Session, query: str, current_user_id: int):
+    is_followed_subq = db.query(UserFollow).filter(
+        UserFollow.follower_id == current_user_id,
+        UserFollow.followed_id == User.id
+    ).exists()
+
+    return db.query(
+        User,
+        is_followed_subq.label("is_followed")
+    ).filter(
+        User.username.ilike(f"%{query}%"),
+        User.id != current_user_id
+    ).limit(10).all()
