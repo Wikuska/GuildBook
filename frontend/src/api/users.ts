@@ -31,11 +31,11 @@ export const fetchUserProfile = ({ id }: FetchUserProfileParams) => {
   return apiFetch<PublicUserResponse>(`/users/${id}`);
 };
 
-export function toggleFollowUser(userId: string, isFollowing: boolean) {
+export const toggleFollowUser = (userId: string, isFollowing: boolean) => {
   return apiFetch<void>(`/users/${userId}/follow`, {
     method: isFollowing ? "DELETE" : "POST",
   });
-}
+};
 
 export const searchUsers = (query: string) => {
   return apiFetch<UserSearchResult[]>(`/users/search?q=${query}`);

@@ -20,12 +20,15 @@ import {
   ContractsPage,
 } from "./pages/MainPages";
 import UserProfile from "./pages/UserProfile";
+import { SettingsPage } from "./pages/SettingsPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
 import { Toaster, toast } from "sonner";
 import { ApiError } from "./api/client";
 import "./index.css";
 import { PostViewModal } from "./components/modals/PostViewModal";
+import { AccountSettings } from "./pages/AccountSettings";
+import { ProfileSettings } from "./pages/ProfileSettings";
 
 const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -93,6 +96,11 @@ function AppRoutes() {
             <Route path="/feed/contracts" element={<ContractsPage />} />
             <Route path="/profile/:id" element={<UserProfile />} />
             <Route path="/post/:id" element={<PostViewModal />} />
+            <Route path="/settings" element={<SettingsPage />}>
+              <Route index element={<Navigate to="profile" replace />} />
+              <Route path="profile" element={<ProfileSettings />} />
+              <Route path="account" element={<AccountSettings />} />
+            </Route>
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/auth" />} />
