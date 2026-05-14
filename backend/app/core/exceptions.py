@@ -14,7 +14,11 @@ class EmailAlreadyExistsError(AppException):
 class UsernameAlreadyExistsError(AppException):
     status_code = 400
     detail = "Username already exists"
-
+    
+class IncorrectOldPasswordError(AppException):
+    status_code = 400
+    detail = "Incorrect old password"
+    
 class InvalidCredentialsError(AppException):
     status_code = 401
     detail = "Invalid email or password"

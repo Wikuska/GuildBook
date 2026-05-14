@@ -22,13 +22,6 @@ def create_user(db: Session, username: str, email: str, hashed_password: str, ra
     db.refresh(user)
     return user
 
-def update_user(db: Session, user: User, **kwargs) -> User:
-    for key, value in kwargs.items():
-        setattr(user, key, value)
-    db.commit()
-    db.refresh(user)
-    return user
-
 def search_users(db: Session, query: str, current_user_id: int):
     is_followed_subq = db.query(UserFollow).filter(
         UserFollow.follower_id == current_user_id,

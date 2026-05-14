@@ -5,21 +5,12 @@ from app.services import auth
 from app.models import User
 from app.services import user as user_service
 from app.services import follow as follow_service
-from app.schemas.user import UpdateProfileRequest, PublicUserResponse, FollowStatusResponse, PrivateUserResponse, UserSearchResult
+from app.schemas.user import PublicUserResponse, FollowStatusResponse, UserSearchResult
 
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-
-@router.patch("/me", response_model=PrivateUserResponse)
-def update_profile(
-    data: UpdateProfileRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(auth.get_current_user),
-):
-    return user_service.update_profile(db, data, current_user)
-
-@router.get("/search", response_model=list[UserSearchResult])
+@router.get("/search",   response_model=list[UserSearchResult])
 def search_users(q: str, db: Session = Depends(get_db), current_user: User = Depends(auth.get_current_user)):
     return user_service.search_users(db, q, current_user)
 
