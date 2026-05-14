@@ -15,6 +15,7 @@ import { MultiSelect } from "../ui/MultiSelect";
 import { cn } from "../../utils";
 import { useCreatePost, useUpdatePost } from "../../hooks/posts";
 import { useModalOverlay } from "../../hooks/ui/useModalOverlay";
+import { Button } from "../ui/Button";
 
 export const CreatePostModal = () => {
   const { isCreatePostOpen, closeCreatePost, editingPost } = usePostFormStore();
@@ -110,7 +111,7 @@ export const CreatePostModal = () => {
           [ Close ]
         </button>
 
-        <h2 className="text-gold uppercase tracking-[2px] text-lg mb-6 border-b border-border-accent pb-2">
+        <h2 className="text-xl font-bold text-text-light mb-6 text-text-mid">
           {isEditing ? "Edit Chronicle Entry" : "New Chronicle Entry"}
         </h2>
 
@@ -233,24 +234,25 @@ export const CreatePostModal = () => {
           </div>
 
           <div className="flex justify-end items-center gap-4 pt-4 mt-2 border-t border-border-accent">
-            <button
+            <Button
               type="button"
               onClick={handleSuccess}
-              className="text-text-dim hover:text-text-mid transition-colors uppercase text-[13px] tracking-[1.5px]"
+              className="text-text-dim hover:text-text-mid transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={
                 isSubmitting ||
                 createPostMutation.isPending ||
                 updatePostMutation.isPending
               }
-              className="bg-bg-surface border border-gold text-gold hover:bg-bg-hover transition-colors px-6 py-2 uppercase tracking-[2px] text-[13px] rounded-sm disabled:opacity-50"
+              className="px-6 py-2"
+              variant="default"
             >
               {isEditing ? "Save changes" : "Publish"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
