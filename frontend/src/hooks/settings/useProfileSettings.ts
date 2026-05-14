@@ -3,6 +3,7 @@ import {
   updateProfileSettings,
 } from "../../api/settings";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useProfileSettings() {
   return useQuery({
@@ -19,6 +20,9 @@ export function useUpdateProfileSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["users", "current"],
+      });
+      toast.success("Profile saved", {
+        description: "The chronicle has been updated.",
       });
     },
   });

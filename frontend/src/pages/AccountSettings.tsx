@@ -24,7 +24,7 @@ export function AccountSettings() {
   const emailForm = useForm<ChangeEmailFormValues>({
     resolver: zodResolver(changeEmailSchema),
     values: {
-      email: user?.email || "",
+      new_email: user?.email || "",
     },
   });
 
@@ -63,9 +63,9 @@ export function AccountSettings() {
             <Input
               label="Current Email"
               type="email"
-              error={emailForm.formState.errors.email?.message}
+              error={emailForm.formState.errors.new_email?.message}
               containerClassName="mb-0"
-              {...emailForm.register("email")}
+              {...emailForm.register("new_email")}
             />
             <div className="flex justify-end pt-2">
               <Button

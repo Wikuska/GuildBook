@@ -32,7 +32,8 @@ import { ProfileSettings } from "./pages/ProfileSettings";
 
 const queryClient = new QueryClient({
   mutationCache: new MutationCache({
-    onError: (error) => {
+    onError: (error, _variables, _context, mutation) => {
+      if (mutation.meta?.silent) return;
       if (error instanceof ApiError) {
         if (error.status === 401) return;
 
