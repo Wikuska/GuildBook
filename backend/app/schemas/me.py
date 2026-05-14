@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
-from backend.app.schemas.post import RaceResponse
+from app.schemas.post import RaceResponse
 
 class UpdateProfileRequest(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)

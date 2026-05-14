@@ -5,10 +5,9 @@ from app.crud import user as user_crud
 from app.crud import me as me_crud
 from app.crud import follow as follow_crud
 from app.core.exceptions import EmailAlreadyExistsError, IncorrectOldPasswordError, UsernameAlreadyExistsError
-from backend.app.services.user import _get_base_user_data
+from app.services.user import _get_base_user_data
 from app.services.auth import verify_password, hash_password
 
-from backend.app.services.user import _get_base_user_data
 def build_private_user_response(db: Session, user: User) -> PrivateUserResponse:
     base_data = _get_base_user_data(db, user)
 

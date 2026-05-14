@@ -32,7 +32,7 @@ export type UpdateUserProfileFormValues = z.infer<
 >;
 
 export const changeEmailSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  new_email: z.email("Please enter a valid email address"),
 });
 
 export type ChangeEmailFormValues = z.infer<typeof changeEmailSchema>;

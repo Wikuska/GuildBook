@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchFeedProfile } from "../../api/auth";
+import { fetchFeedProfile } from "../../api/settings";
 import { useAuthStore } from "../../store/authStore";
 
 export function useCurrentUser() {

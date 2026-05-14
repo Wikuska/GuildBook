@@ -15,19 +15,19 @@ router = APIRouter(
 def get_me(current_user: User = Depends(auth.get_current_user)):
     return current_user
 
-@router.get("feed-profile", response_model=UserFeedResponse)
-def get_feed_profile(
-    current_user: User = Depends(auth.get_current_user),
-    db: Session = Depends(get_db)):
-    return me_services.get_feed_profile(current_user, db)
-
-@router.patch("/me", response_model=PrivateUserResponse)
+@router.patch("", response_model=PrivateUserResponse)
 def update_profile(
     data: UpdateProfileRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth.get_current_user),
 ):
     return me_services.update_profile(db, data, current_user)
+
+@router.get("/feed-profile", response_model=UserFeedResponse)
+def get_feed_profile(
+    current_user: User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)):
+    return me_services.get_feed_profile(current_user, db)
 
 @router.post("/change-password")
 def change_password(
