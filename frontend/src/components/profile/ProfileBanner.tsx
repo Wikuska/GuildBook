@@ -66,7 +66,7 @@ export function ProfileBanner({ bannerUrl }: { bannerUrl: string | null }) {
   }
 
   return (
-    <div className="relative h-35 shrink-0 overflow-hidden">
+    <div className="relative h-50 shrink-0 overflow-hidden">
       <img
         src={bannerUrl}
         alt="Profile Banner"

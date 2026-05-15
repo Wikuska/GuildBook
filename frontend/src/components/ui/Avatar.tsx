@@ -19,7 +19,7 @@ interface AvatarProps {
   username?: string;
   avatarUrl?: string | null;
   raceName?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 export function Avatar({
@@ -38,7 +38,8 @@ export function Avatar({
   const sizeClasses = {
     sm: "w-8 h-8 text-[11px] border-[1.5px]",
     md: "w-12 h-12 text-[15px] border-2",
-    lg: "w-16 h-16 text-[20px] border-2",
+    lg: "w-20 h-20 text-[20px] border-2",
+    xl: "w-28 h-28 text-[24px] border-2",
   };
 
   return (

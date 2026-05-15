@@ -43,15 +43,15 @@ export function PostCard({ post, queryKey }: PostCardProps) {
     <article
       onMouseLeave={() => setConfirmDelete(false)}
       onClick={() => openViewModal(post.id, queryKey)}
-      className={`group relative cursor-pointer rounded bg-bg-mid p-4 transition-colors hover:border-border-accent
-        before:absolute before:-left-px before:-top-px before:h-2 before:w-2 before:rounded-tl-[1px] before:border-l before:border-t
-        after:absolute after:-bottom-px after:-right-px after:h-2 after:w-2 after:rounded-br-[1px] after:border-b after:border-r
-        ${
-          post.is_followed_author
-            ? "border-y border-r border-border-accent border-l-2 border-l-gold pl-3.75 before:border-gold after:border-gold"
-            : "border border-border-base before:border-border-accent after:border-border-accent"
-        }
-      `}
+      className={`group relative cursor-pointer rounded bg-bg-mid p-6 transition-colors hover:border-border-accent
+    before:absolute before:-left-px before:-top-px before:h-2 before:w-2 before:rounded-tl-[1px] before:border-l before:border-t
+    after:absolute after:-bottom-px after:-right-px after:h-2 after:w-2 after:rounded-br-[1px] after:border-b after:border-r
+    ${
+      post.is_followed_author
+        ? "border-y border-r border-border-accent border-l-2 border-l-gold pl-5 before:border-gold after:border-gold" // Zmieniono też pl-3.75 na pl-5 dla zachowania proporcji z p-6
+        : "border border-border-base before:border-border-accent after:border-border-accent"
+    }
+  `}
     >
       <div className="mb-2.5 flex items-center gap-2">
         <Link

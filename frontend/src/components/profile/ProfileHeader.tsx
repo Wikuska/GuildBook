@@ -17,14 +17,14 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
 
   return (
     <div className="relative shrink-0 border-b border-border-base px-8 pb-6">
-      <div className="-mt-11 mb-4 flex items-end gap-5">
+      <div className="-mt-23 mb-4 flex items-end gap-5">
         <div className="relative shrink-0">
           <div className="absolute -left-1 -top-1 h-2.25 w-2.25 border-l border-t border-sage"></div>
           <Avatar
             username={profile.username}
             avatarUrl={profile.avatar_url}
             raceName={profile.race.name}
-            size="lg"
+            size="xl"
           />
           <div className="absolute -bottom-1 -right-1 h-2.25 w-2.25 border-b border-r border-sage"></div>
         </div>
