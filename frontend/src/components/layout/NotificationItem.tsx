@@ -1,9 +1,8 @@
 import { useMarkOneRead } from "../../hooks/notifications";
-import { usePostViewStore } from "../../store/usePostViewStore";
 import { Avatar } from "../ui/Avatar";
 import { formatTime } from "../../utils";
 import type { NotificationResponse } from "../../api/notifications";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface NotificationItemProps {
   notification: NotificationResponse;
@@ -15,15 +14,17 @@ export function NotificationItem({
   onClose,
 }: NotificationItemProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { mutate: markOne } = useMarkOneRead();
-  const { openPost } = usePostViewStore();
 
   const handleClick = () => {
     if (!n.is_read) markOne(n.id);
     if (n.type === "follow") {
       navigate(`/profile/${n.actor.id}`);
     } else if (n.post_id) {
-      openPost(n.post_id, null);
+      navigate(`/post/${n.post_id}`, {
+        state: { background: location, feedQueryKey: null },
+      });
     }
     onClose();
   };

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useCallback, useRef } from "react";
 import type {
   SseNewMessageEvent,
@@ -17,13 +17,13 @@ import { useFeedStore } from "../../store/feedStore";
 import { getSectionFromCategory } from "../../utils";
 import { toast } from "sonner";
 import { useChatStore } from "../../store/useChatStore";
-import { usePostViewStore } from "../../store/usePostViewStore";
 
 export function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();
   const recentCommentToasts = useRef<Set<number>>(new Set());
-  const navigate = useNavigate();
 
   const { setNewPostsFlag } = useFeedStore();
 
@@ -84,7 +84,9 @@ export function AppLayout() {
             action: {
               label: "View",
               onClick: () => {
-                usePostViewStore.getState().openPost(postId, null);
+                navigate(`/post/${postId}`, {
+                  state: { background: location, feedQueryKey: null },
+                });
               },
             },
           });
