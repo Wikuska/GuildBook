@@ -24,9 +24,14 @@ def setup_db():
         race_1 = Race(id=1, name="Witcher") 
         race_2 = Race(id=2, name="Human")
         
-        category_1 = Category(id=1, name="Event")
+        cat_feed = Category(id=1, name="discussion")
+        cat_market = Category(id=2, name="market")
+        cat_help = Category(id=3, name="help_request")
+        cat_contract = Category(id=4, name="contract")
         
-        db.add_all([race_1, race_2, category_1])
+        tag_1 = Tag(id=1, name="monsters")
+        
+        db.add_all([race_1, race_2, cat_feed, cat_market, cat_help, cat_contract, tag_1])
         db.commit()
     finally:
         db.close()
@@ -99,3 +104,19 @@ def test_post(db_session: Session, test_user: dict):
     db_session.refresh(post)
     
     return post
+
+@pytest.fixture
+def test_comment(db_session: Session, test_post: Post, test_user: dict):
+    user = db_session.query(User).filter_by(username=test_user["username"]).first()
+    assert user is not None
+    
+    comment = Comment(
+        content="Witchers don't work for free.",
+        post_id=test_post.id,
+        author_id=user.id
+    )
+    db_session.add(comment)
+    db_session.commit()
+    db_session.refresh(comment)
+    
+    return comment

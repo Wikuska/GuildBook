@@ -136,3 +136,53 @@ def test_post_visibility_restricted_by_race(authorized_client: TestClient, db_se
 
     assert response.status_code == 404
     assert response.json()["detail"] =="Post not found"
+    
+def test_update_post_success(authorized_client: TestClient, db_session: Session, test_post: Post):
+    payload = {
+        "title": "Updated: How to defeat a Leshen?",
+        "content": "Actually, just run away. It's safer.",
+        "category_id": 1,
+        "tag_ids": [],
+        "visible_race_ids": []
+    }
+    response = authorized_client.put(f"/posts/{test_post.id}", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["title"] == "Updated: How to defeat a Leshen?"
+    assert data["content"] == "Actually, just run away. It's safer."
+
+    db_session.refresh(test_post)
+    assert test_post.title == "Updated: How to defeat a Leshen?"
+
+
+def test_update_post_forbidden(authorized_client: TestClient, db_session: Session):
+    yen = User(
+        username="yennefer",
+        email="yen@vengerberg.com",
+        password_hash="hash",
+        race_id=2
+    )
+    db_session.add(yen)
+    db_session.flush()
+
+    yen_post = Post(
+        title="Portal maintenance",
+        content="Do not interrupt a portal calibration.",
+        author_id=yen.id,
+        category_id=1
+    )
+    db_session.add(yen_post)
+    db_session.commit()
+
+    payload = {
+        "title": "I hate portals",
+        "content": "Portals are the worst.",
+        "category_id": 1,
+        "tag_ids": [],
+        "visible_race_ids": []
+    }
+    response = authorized_client.put(f"/posts/{yen_post.id}", json=payload)
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Only author of the post can edit it"

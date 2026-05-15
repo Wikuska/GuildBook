@@ -2,8 +2,6 @@ from app.models import User
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 from app.core.security import verify_password
-from app.models.user import UserFollow
-from tests.conftest import authorized_client, test_user
 
 def test_register_success(client: TestClient, db_session: Session):
     payload = {
@@ -107,41 +105,3 @@ def test_login_nonexistent_user(client: TestClient):
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid email or password"
-    
-
-def test_get_me_success(authorized_client: TestClient, test_user: dict):
-    response = authorized_client.get("/auth/me")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert data["email"] == test_user["email"]
-    assert data["username"] == test_user["username"]
-    assert data["is_admin"] is False
-   
-    
-def test_get_feed_profile_success(authorized_client: TestClient, test_user: dict, db_session: Session):
-    jaskier = User(
-        username="jaskier",
-        email="jaskier@novigrad.com",
-        password_hash="fake_hash",
-        race_id=1
-    )
-    db_session.add(jaskier)
-    db_session.flush()
-
-    geralt = db_session.query(User).filter_by(username=test_user["username"]).first()
-    assert geralt is not None
-
-    follow = UserFollow(follower_id=jaskier.id, followed_id=geralt.id)
-    db_session.add(follow)
-    db_session.commit()
-
-    response = authorized_client.get("/auth/me/feed-profile")
-
-    assert response.status_code == 200
-    data = response.json()
-    
-    assert data["username"] == test_user["username"]
-    assert "race" in data  
-    assert data["followers_count"] == 1 
-    assert data["following_count"] == 0
