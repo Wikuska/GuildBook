@@ -32,7 +32,9 @@ The system features real-time interactions, a dynamic feed, and a unique role-ba
 <br>
 
 ## Screenshots
-
+![Bookings list](docs/auth.png)
+![Booking form](docs/feed.png)
+![Swagger API docs](docs/profile.png)
 <br>
 
 ## Running with Docker
