@@ -71,8 +71,8 @@ Use these accounts to test real-time interactions and race-based permissions:
  
 | | Email | Password |
 |---|---|---|
-| User 1 (Human) | geralt@example.com | password123 |
-| User 2 (Mage) | yennefer@example.com | password123 |
+| User 1 (Human) | geralt@kaermorhen.com | password123 |
+| User 2 (Mage) | yennefer@aretuza.com | password123 |
 
 <br>
 
