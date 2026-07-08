@@ -3,6 +3,7 @@ import { fetchMessages } from "../../api/conversations";
 import type { MessageResponse } from "../../api/conversations";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/authStore";
+import { API_URL } from "../../api/client";
 
 export function useMessages(conversationId: number | null | undefined) {
   const token = useAuthStore((s) => s.token);
@@ -24,9 +25,8 @@ export function useMessages(conversationId: number | null | undefined) {
         if (!isSubscribed) return;
         setMessages(history);
 
-        ws = new WebSocket(
-          `ws://localhost:8000/conversations/${conversationId}/ws`,
-        );
+        const wsBaseUrl = API_URL.replace(/^http/, "ws");
+        ws = new WebSocket(`${wsBaseUrl}/conversations/${conversationId}/ws`);
         wsRef.current = ws;
 
         ws.onopen = () => {
