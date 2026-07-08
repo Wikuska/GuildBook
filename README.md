@@ -8,12 +8,29 @@
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
 
+
 <br>
 
 A full-stack fantasy social platform — built like a guild network, styled after the world of The Witcher. Built with **FastAPI** and **React**.  
 The system features real-time interactions, a dynamic feed, and a unique role-based access control system where content visibility depends on the user's in-game race (e.g., restricted market offers).
 
 **Built solo** as a personal project to push into new territory: WebSockets, Server-Sent Events, and auth from scratch for the first time.
+
+<br>
+
+## Live Demo
+Check out the live version of the project: [GuildBook Live](https://guildbook-front.vercel.app)
+
+> **Note:** The backend is hosted on a free tier, so it may take **30-50 seconds** to wake up on the first load. If the page doesn't load immediately, please wait a moment!
+
+### Test Credentials
+ 
+Use these accounts to test real-time interactions and race-based permissions:
+ 
+| | Email | Password |
+|---|---|---|
+| User 1 (Human) | geralt@kaermorhen.com | password123 |
+| User 2 (Mage) | yennefer@aretuza.com | password123 |
 
 <br>
 
@@ -65,16 +82,6 @@ Backend API (Swagger): http://localhost:8000/docs
 docker-compose down -v
 ```
 
-### Test Credentials
- 
-Use these accounts to test real-time interactions and race-based permissions:
- 
-| | Email | Password |
-|---|---|---|
-| User 1 (Human) | geralt@kaermorhen.com | password123 |
-| User 2 (Mage) | yennefer@aretuza.com | password123 |
-
-<br>
 
 ## Tech Stack
 
