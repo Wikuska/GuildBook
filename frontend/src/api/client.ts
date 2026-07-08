@@ -1,6 +1,6 @@
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from "../store/authStore";
 
-export const API_URL = "http://127.0.0.1:8000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export class ApiError extends Error {
   status: number;
@@ -8,7 +8,7 @@ export class ApiError extends Error {
   constructor(status: number, message: string) {
     super(message);
     this.status = status;
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -17,18 +17,21 @@ interface ApiOptions extends RequestInit {
 }
 
 function parseErrorMessage(errorData: any): string {
-  if (!errorData.detail) return 'Something went wrong';
-  
+  if (!errorData.detail) return "Something went wrong";
+
   if (Array.isArray(errorData.detail)) {
     return errorData.detail
       .map((e: any) => `${e.loc.at(-1)}: ${e.msg}`)
-      .join(', ');
+      .join(", ");
   }
-  
+
   return errorData.detail;
 }
 
-export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  options: ApiOptions = {},
+): Promise<T> {
   const { body, ...customConfig } = options;
 
   const token = useAuthStore.getState().token;
@@ -51,14 +54,14 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   const res = await fetch(`${API_URL}${path}`, config);
 
   if (res.status === 401) {
-    const isAuthRoute = path.startsWith('/auth');
-    
+    const isAuthRoute = path.startsWith("/auth");
+
     if (!isAuthRoute) {
       useAuthStore.getState().logout();
-      window.location.href = '/auth';
-      return Promise.reject(new Error('Session expired'));
+      window.location.href = "/auth";
+      return Promise.reject(new Error("Session expired"));
     }
-    
+
     const errorData = await res.json().catch(() => ({}));
     throw new ApiError(res.status, parseErrorMessage(errorData));
   }
